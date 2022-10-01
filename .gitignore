@@ -8,6 +8,6 @@ __pycache__
 oauth/*
 images/*
 logs/*
-notebooks
-notebooks/*
+notebooks/cookies.pkl
+notebooks/run.log
 src.egg-info/*
