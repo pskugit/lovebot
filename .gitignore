@@ -12,3 +12,4 @@ notebooks/cookies.pkl
 notebooks/run.log
 src.egg-info/*
 chromedata/*
+chromedata
