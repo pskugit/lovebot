@@ -49,7 +49,6 @@ class BikiniModel(ImageModel):
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225] )])
         self.classes = ("no_bikini","bikini")
-    
         super().__init__(model_path)
 
 class LikeModel(ImageModel):
@@ -61,7 +60,6 @@ class LikeModel(ImageModel):
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225] )])
         self.classes = ("dislike","like")
-    
         super().__init__(model_path)
 
 TRAINED_MODELS = {
