@@ -1,4 +1,4 @@
-.
+-e .
 ipykernel
 pandas
 python-statemachine
