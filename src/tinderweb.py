@@ -96,13 +96,13 @@ class Profile():
         self.image_paths = None 
         # set via evaluate_images()
         self.has_bikini = None 
-        self.beautyscore = None 
+        self.likescore = None 
         # set via ta.evaluate()
         self.choice = None 
     
     def __str__(self):
-        return f"{self.infos[0]}_{self.infos[1]}_{self.infos[2]}_{self.infos[3]}\n\npic_count: {self.pic_count}\nbikini pic: {self.has_bikini}\nbeautyscore: {self.beautyscore}\n\nchoice: {self.choice}".replace("-","\n")
-        #return f"name: {self.infos[0]}\nage: {self.infos[1]}\ndistance: {self.infos[2]}\n\npic_count: {self.pic_count}\nimage_paths: -{'-'.join(self.image_paths)}\n\nbikini pic: {self.has_bikini}\nbeautyscore: {self.beautyscore}\n\nchoice: {self.choice}".replace("-","\n")
+        return f"{self.infos[0]}_{self.infos[1]}_{self.infos[2]}_{self.infos[3]}\n\npic_count: {self.pic_count}\nbikini pic: {self.has_bikini}\nlikescore: {self.likescore}\n\nchoice: {self.choice}".replace("-","\n")
+        #return f"name: {self.infos[0]}\nage: {self.infos[1]}\ndistance: {self.infos[2]}\n\npic_count: {self.pic_count}\nimage_paths: -{'-'.join(self.image_paths)}\n\nbikini pic: {self.has_bikini}\nlikescore: {self.likescore}\n\nchoice: {self.choice}".replace("-","\n")
 
     def show_images(self):
         fig = plt.figure(figsize=(16, 7))
@@ -123,12 +123,12 @@ class Profile():
             self.choice = "right"
             print(f"Evaluated choice to {self.choice} because of bikini")
         else:
-            if self.beautyscore is None:
+            if self.likescore is None:
                 self.choice = "right" if random.random() >= score_threshold else "left"
                 print(f"Evaluated choice to {self.choice} because of random choice")
                 return
-            self.choice = "right" if self.beautyscore >= score_threshold else "left"
-            print(f"Evaluated choice to {self.choice} because of beautyscore")
+            self.choice = "right" if self.likescore >= score_threshold else "left"
+            print(f"Evaluated choice to {self.choice} because of likescore")
         #self.choice = random.choice(["left", "right"])
         
 

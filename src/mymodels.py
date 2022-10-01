@@ -27,6 +27,8 @@ class ImageModel():
         if device=="auto":
             self.device = self.get_cuda_device()
         self.weights_path = weights_path
+        if not weights_path:
+            raise AttributeError("weights_path for ImageModel not specified")
         self._load_weights()
         self.net.to(self.device)
         self.net.eval()
@@ -64,7 +66,7 @@ class ImageModel():
         return torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class BikiniModel(ImageModel):
-    def __init__(self, weights_path="/Users/philippskudlik/local_dev/tndr/models/bikini/wideresnet_20_07_21-12__89888888.pt", device="auto"):
+    def __init__(self, weights_path="", device="auto"):
         self.crop_size = 448
         self.data_transforms = torchvision.transforms.Compose([
             torchvision.transforms.Resize(self.crop_size),
@@ -77,15 +79,15 @@ class BikiniModel(ImageModel):
         self.net.fc = torch.nn.Linear(2048, len(self.classes))
         super().__init__(weights_path, device)
 
-class BeautyModel(ImageModel):
-    def __init__(self, weights_path="/Users/philippskudlik/local_dev/tndr/models/beauty/wideresnet_21_07_22-47.pt", device="auto"):
+class LikeModel(ImageModel):
+    def __init__(self, weights_path="", device="auto"):
         self.crop_size = 448
         self.data_transforms = torchvision.transforms.Compose([
             torchvision.transforms.Resize(self.crop_size),
             torchvision.transforms.RandomCrop(self.crop_size),
             torchvision.transforms.ToTensor(),
             torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225] )])
-        self.classes = ("not","hot")
+        self.classes = ("dislike","like")
     
         self.net = torchvision.models.wide_resnet50_2(num_classes=1000, weights=None)
         self.net.fc = torch.nn.Linear(2048, len(self.classes))
@@ -93,5 +95,5 @@ class BeautyModel(ImageModel):
 
 TRAINED_MODELS = {
     "bikini": BikiniModel,
-    "beauty": BeautyModel,
+    "like": LikeModel,
 }
