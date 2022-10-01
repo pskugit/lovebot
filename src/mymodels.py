@@ -36,22 +36,24 @@ class ImageModel():
     def _load_weights(self):
         self.net.load_state_dict(torch.load(self.weights_path, map_location=torch.device('cpu')))
         
-    def inference(self, image, return_logits=False):
+    def inference(self, image, return_logits=False, softmax=False):
         with torch.no_grad():
             img_tensor = self.data_transforms(image).unsqueeze(0).to(self.device)
             logits = self.net(img_tensor)
+            if softmax:
+                logits = F.softmax(logits)
             pred_class = np.argmax(logits.cpu(),axis=1).item()
             if return_logits:
                 return self.classes[pred_class], logits.cpu()
             else:
                 return self.classes[pred_class]
 
-    def inference_pathlist(self,pathlist,verbose=True):
+    def inference_pathlist(self,pathlist,verbose=True, softmax=False):
         preds = []
         logitss = []
         for img_path in pathlist:
             img = self.load_image(img_path)
-            pred, logits = self.inference(img, return_logits=True)
+            pred, logits = self.inference(img, return_logits=True, softmax=softmax)
             if verbose:
                 print(f"{img_path}: {pred}, {logits}")
             preds.append(pred)
