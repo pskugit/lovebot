@@ -10,3 +10,4 @@ images/*
 logs/*
 notebooks
 notebooks/*
+src.egg-info/*

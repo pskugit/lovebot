@@ -1,4 +1,3 @@
-from csv import writer
 import pandas as pd
 import numpy as np
 
@@ -10,36 +9,7 @@ STATUS_CODE = {0: "NEW",
               12: "FAILED"
               }
 
-STATUS_CODE_INV = {v: k for k, v in STATUS_CODE.items()}
-
-
-class Allowance():
-    def __init__(self, path="gpt_allowance.csv"):
-        self.data = pd.DataFrame()
-        self.path = path
-        
-    def read(self):
-        self.data = pd.read_csv(self.path, header=0)
-        if str(pd.Timestamp.today().date()) == self.data.Date.iloc[-1]:
-            self.tokens = self.data.Tokens.iloc[-1]
-        else:
-            with open(self.path,'a') as fd:
-                fd.write("\n"+str(pd.Timestamp.today().date())+",50")
-                self.tokens = 50
-    
-    def get_tokens(self):
-        self.read()
-        return self.tokens
-    
-    def set_tokens(self, value):
-        self.read()
-        self.data.iloc[-1,1] = value
-        self.data.to_csv(self.path, index=None)
-    
-    def decrement(self):
-        self.data.iloc[-1,1] = self.data.iloc[-1,1] -1
-        self.data.to_csv(self.path, index=None)
-        
+STATUS_CODE_INV = {v: k for k, v in STATUS_CODE.items()}      
         
 class Backlog():
     def __init__(self, path="backlog.csv"):
