@@ -43,6 +43,18 @@ class ImageModel():
                 return self.classes[pred_class], logits.cpu()
             else:
                 return self.classes[pred_class]
+
+    def inference_pathlist(self,pathlist,verbose=True):
+        preds = []
+        logitss = []
+        for img_path in pathlist:
+            img = self.load_image(img_path)
+            pred, logits = self.inference(img, return_logits=True)
+            if verbose:
+                print(f"{img_path}: {pred}, {logits}")
+            preds.append(pred)
+            logitss.append(logits)
+        return preds, logitss
         
     def load_image(self, path):
         #print("loading...", path)

@@ -2,8 +2,19 @@ from csv import writer
 import pandas as pd
 import numpy as np
 
+STATUS_CODE = {0: "NEW",
+              1: "RUNNING",
+              2: "ERRONOUS",
+              10: "DONE",
+              11: "EXPIRED",
+              12: "FAILED"
+              }
+
+STATUS_CODE_INV = {v: k for k, v in STATUS_CODE.items()}
+
+
 class Allowance():
-    def __init__(self, path ="gpt_allowance.csv"):
+    def __init__(self, path="gpt_allowance.csv"):
         self.data = pd.DataFrame()
         self.path = path
         
@@ -31,7 +42,7 @@ class Allowance():
         
         
 class Backlog():
-    def __init__(self, path ="D:\\programming\\tinder_automator\\backlog.csv"):
+    def __init__(self, path="backlog.csv"):
         self.data = pd.DataFrame()
         self.path = path
         self.load()
@@ -47,7 +58,10 @@ class Backlog():
         self.data = self.data.drop("Rank", axis=1)
         self.data = self.data.merge(tasks.Rank, how="left", left_index=True, right_index=True)
         self.data.Rank = self.data.Rank.fillna(self.data.Rank.max())
-        self.data.Rank = np.where(self.data.Status == 0,-1,self.data.Rank)
+        # all new matches get rank -1
+        self.data.Rank = np.where(self.data.Status == STATUS_CODE_INV["NEW"],-1,self.data.Rank)
+        # all erronous matched get rank 0
+        self.data.Rank = np.where(self.data.Status == STATUS_CODE_INV["ERRONOUS"],-1,self.data.Rank)
         self.data = self.data.sort_values("Rank")
 
     def save(self):

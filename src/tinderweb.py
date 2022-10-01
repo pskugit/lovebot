@@ -37,6 +37,8 @@ with socket.create_connection((hostname, 443)) as sock:
     with context.wrap_socket(sock, server_hostname=hostname) as ssock:
         print(ssock.version())
 
+SLEEP_MULTIPLIER = 2
+
 class Controller(StateMachine):
     swiping = State('swiping', initial=True)
     texting = State('texting')
@@ -46,6 +48,9 @@ class Controller(StateMachine):
     choice = scraping.to(swiping)
     swipe = texting.to(swiping)
     
+    def wait(self, sec):
+        time.sleep(sec*SLEEP_MULTIPLIER)
+
     def on_enter_swiping(self):
         print('Swiping!')
 
@@ -57,19 +62,29 @@ class Controller(StateMachine):
                         "superlike": superlike_btn}
         choice = self.model.current_profile.choice
         choice_dict[choice].click()
-        time.sleep(2)
+        self.wait(0.5)
         print(f'Swiping {choice}. Closing card!')
         self.model.remove_overlay()
         self.model.current_profile = None
-        time.sleep(2)
+        self.wait(0.5)
 
-    def on_scrape(self):
+    def on_scrape(self, folder_name):
+        print("on_scrape folder_name:",folder_name)
         open_card_infos = self.model.open_card()
         print('Opened card! Retrieved open_card_infos.')
         print(open_card_infos)
-        downloads = self.model.scrape_images()
+        downloads = self.model.scrape_images(folder_name=folder_name)
         #print('Saved images...')
         #print(downloads)
+    
+    def __enter__(self):
+        self.model.start_browser()
+        self.model.reset()
+        return self
+
+    def __exit__(self, *args): 
+        self.model.end_session()
+
 
 class Profile():
     def __init__(self, open_card_infos):
@@ -99,7 +114,7 @@ class Profile():
             plt.axis('off')
         plt.show()
     
-    def evaluate(self):
+    def evaluate(self, score_threshold=0.5):
         self.choice = "left"
         if self.infos[2] > 1000:
             self.choice = "left"
@@ -108,33 +123,41 @@ class Profile():
             self.choice = "right"
             print(f"Evaluated choice to {self.choice} because of bikini")
         else:
-            self.choice = "right" if self.beautyscore >= 0.5 else "left"
+            if self.beautyscore is None:
+                self.choice = "right" if random.random() >= score_threshold else "left"
+                print(f"Evaluated choice to {self.choice} because of random choice")
+                return
+            self.choice = "right" if self.beautyscore >= score_threshold else "left"
             print(f"Evaluated choice to {self.choice} because of beautyscore")
         #self.choice = random.choice(["left", "right"])
         
 
 class TinderAutomator():  
-    def __init__(self, initial_state="swiping", startpage="https://tinder.com/app/recs"):
+    def __init__(self, initial_state="swiping", startpage="https://tinder.com/app/recs", chromedata_path="chromedata", headless=False):
+        self.headless = headless
         self.initial_state = initial_state
         self.startpage = startpage
-        chromedriver_path="../chromedriver_98.0"
-        self.browser = self.start_browser()
+        self.chromedata_path = chromedata_path
         self.log_path = 'runs.log'
-        self.reset()
+        self.browser = None
   
-    
-    def start_browser(self, chromedriver_path=None):
+    def start_browser(self):
         options = webdriver.ChromeOptions()
         options.add_argument('--disable-blink-features=AutomationControlled')
         options.add_argument("--window-size=1920,1080")
+        options.add_argument('--disable-dev-shm-usage')
         options.add_argument("--start-maximized")
-        options.add_argument("user-data-dir=chromedata")
+        #options.add_argument("user-data-dir=chromedata")
+        if self.chromedata_path is not None:
+            options.add_argument("--user-data-dir="+self.chromedata_path)
         options.add_argument("--disable-dev-shm-usage")
-
-        #options.add_argument("--headless");
-        #browser = webdriver.Chrome(executable_path=chromedriver_path, options=options)
+        if self.headless:
+            options.add_argument("--headless")
         browser = webdriver.Chrome(options=options)
-        return browser
+        self.browser = browser
+
+    def wait(self, sec):
+        time.sleep(sec*SLEEP_MULTIPLIER)
 
     def find_by_xpath(self, xpath):
         try:
@@ -148,7 +171,7 @@ class TinderAutomator():
         element = self.find_by_xpath(xpath)
         if element is not None:
             element.click()
-            time.sleep(2)
+            self.wait(0.5)
 
     def find_btn(self, searchstring):
         btns = self.browser.find_elements(By.CLASS_NAME, "focus-button-style")
@@ -158,7 +181,7 @@ class TinderAutomator():
 
     def get(self,url):
         self.browser.get(url)
-        time.sleep(2) 
+        self.wait(0.5)
             
     def quit(self):
         self.browser.quit()
@@ -168,53 +191,44 @@ class TinderAutomator():
         self.current_profile = None
         self.state = self.initial_state
         self.new_listings = []
-        time.sleep(2)
+        self.wait(0.5)
         self.get(self.startpage)
-        time.sleep(6)
-                
-    def _get_conversations(self, messageListItem):
+        self.wait(3)
+                   
+    def _get_new(self, newtype, match_or_messageListItems):
+        """type can be 'matches' or 'conversations'"""
+        class_name_dict = {
+            "matches": 'Ell',
+            "conversations": 'messageListItem__name',
+        }
         matches = {}
-        for i, mli in enumerate(messageListItem):
-            match_meta = {}
-            match_meta["Status"] = 1
-            match_meta["msg_count"] = None
-            try:
-                match_meta["Name"] = mli.find_element(By.CLASS_NAME, 'messageListItem__name').text
-            except NoSuchElementException:
-                continue
-            match_meta["Link"] = mli.get_attribute("href")
-            id_ = match_meta["Link"].split("/")[-1]
-            match_meta["Rank"] = i
-            matches[id_] = match_meta
-        return matches
-    
-    def _get_new_matches(self, matchListItems):
-        matches = {}
-        for i, mli in enumerate(matchListItems):
+        for i, mli in enumerate(match_or_messageListItems):
             match_meta = {}
             match_meta["Status"] = 0
             match_meta["msg_count"] = 0
             try:
-                match_meta["Name"] = mli.find_element(By.CLASS_NAME, 'Ell').text
+                match_meta["Name"] = mli.find_element(By.CLASS_NAME, class_name_dict[newtype]).text
             except NoSuchElementException:
                 continue
             match_meta["Link"] = mli.get_attribute("href")
             id_ = match_meta["Link"].split("/")[-1]
             match_meta["Rank"] = i
+            match_meta["ErrorCount"] = 0
+            match_meta["LastMessageTimestamp"] = None
             matches[id_] = match_meta
         return matches
                
     def generate_tasklist(self):
         """
-        collects all matches, both new ones (_get_new_matches) and old ones (_get_conversations) 
+        collects all matches, both new ones (_get_new) and old ones (_get_new) 
         """
         self.find_btn("Matches").click()
         matchListItems = self.browser.find_elements(By.CLASS_NAME, 'matchListItem')
-        new_matches = self._get_new_matches(matchListItems)
-        time.sleep(2)
+        new_matches = self._get_new("matches",matchListItems)
+        self.wait(0.5)
         self.find_btn("Nachrichten").click()
         messageListItem = self.browser.find_elements(By.CLASS_NAME, 'messageListItem')
-        conversations = self._get_conversations(messageListItem)
+        conversations = self._get_new("conversations",messageListItem)
         tasks = {**new_matches, **conversations}
         return tasks
     
@@ -232,7 +246,9 @@ class TinderAutomator():
         myturn = True if not messeges else (conversation[-1][0] or conversation[-1][1])
         return myturn, conversation
     
-    def write_message(self, text, dryrun=True):    
+    def write_message(self, text, dryrun=True): 
+        if not text:
+            return   
         JS_ADD_TEXT_TO_INPUT = """
           var elm = arguments[0], txt = arguments[1];
           elm.value = txt;
@@ -261,8 +277,8 @@ class TinderAutomator():
         return bio, match_date
     
     def end_session(self):
-        with open("cookies.pkl", "wb") as f:
-            pickle.dump(self.browser.get_cookies() , f)
+        #with open("cookies.pkl", "wb") as f:
+        #    pickle.dump(self.browser.get_cookies() , f)
         self.browser.quit() 
         
     def save_cookies(self):
@@ -295,12 +311,14 @@ class TinderAutomator():
         #match_layer = "IT’S A" in text.split("\n")
         #if match_layer:
         self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.ESCAPE)
+        self.wait(3)
 
     def open_card(self):
-        current_card = self.browser.find_element(By.CSS_SELECTOR, '[focusable="true"]')
-        name = current_card.find_element(By.CSS_SELECTOR, '[ itemprop="name"]').text
+        profiles = self.browser.find_element(By.CSS_SELECTOR, '[aria-label="Profile"]')
+        # tinder always shows 3 profiles at a time. Only the middle one (hence index 1) is the visible one
+        name = profiles.find_elements(By.CSS_SELECTOR, '[ itemprop="name"]')[1].text
         try:
-            age = current_card.find_element(By.CSS_SELECTOR, '[itemprop="age"]').text
+            age = profiles.find_elements(By.CSS_SELECTOR, '[itemprop="age"]')[1].text
         except NoSuchElementException:
             age = "0"
 
@@ -315,7 +333,7 @@ class TinderAutomator():
             if "Kilometer entfernt" in textblock:
                 km_block = re.findall(r'\d+ Kilometer entfernt', textblock)[0]
                 distance = int(km_block.split(" ")[0])
-        
+
         self.current_profile = Profile((name, age, distance, checksum))
         return name, age, distance, checksum
 
@@ -332,9 +350,9 @@ class TinderAutomator():
         print(f"\n{name}, {age}, {distance}km, {checksum}: Scraping {pic_count} picture(s)...")
 
         for i, picture in enumerate(pictures):
-            time.sleep(0.8) 
+            self.wait(0.1) 
             filename = f"{name}_{age}_{distance}_{checksum}_{i}".replace(" ", "")
-            print(filename)
+
             pic = picture.find_element(By.CLASS_NAME, "profileCard__slider__img")
 
             # get url and extension
@@ -355,7 +373,7 @@ class TinderAutomator():
 
             # convert to jpg if neccessary
             if extension == ".webp":
-                download_jpg = download.split(".")[:-1][0]+".jpg"
+                download_jpg = download[:-4]+"jpg"
                 im = Image.open(download).convert("RGB")
                 im.save(download_jpg, "jpeg")
                 os.remove(download)
