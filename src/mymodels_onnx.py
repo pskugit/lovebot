@@ -1,9 +1,7 @@
-import numpy as np
-from PIL import Image
-
-import onnxruntime as ort
 import torchvision
-import torch.nn.functional as F
+import numpy as np
+import onnxruntime as ort
+from PIL import Image
 from src.utils import softmax
 
 class ImageModel():

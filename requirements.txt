@@ -6,12 +6,11 @@ openai
 selenium
 scipy
 chromedriver_autoinstaller
-torch
 torchvision
-yagmail
 matplotlib
 seaborn
 scikit-learn
 scikit-image
 python-dotenv
 onnxruntime
+Pillow
