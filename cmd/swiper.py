@@ -15,8 +15,8 @@ from dotenv import load_dotenv
 load_dotenv()
 
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
-from src.data_interface import Allowance, Backlog
-from src.gpt3 import Gpt3
+from src.data_interface import Backlog
+from src.gpt3 import Gpt3, Allowance
 from src.mymodels import TRAINED_MODELS
 
 import urllib
@@ -54,7 +54,7 @@ ta = TinderAutomator(chromedata_path=config['DEFAULT']['ChromeDataPath'])
 # %%
 # initialize models
 bikini_model = TRAINED_MODELS["bikini"](weights_path=config["MODELS"]["Bikini"])
-beauty_model = TRAINED_MODELS["beauty"](weights_path=config["MODELS"]["Beauty"])
+like_model = TRAINED_MODELS["like"](weights_path=config["MODELS"]["Like"])
 
 # %%
 with Controller(ta) as controller:
@@ -74,8 +74,8 @@ with Controller(ta) as controller:
                 shutil.copy2(bikini_path, scraping_folder_path+"/bikini/"+bikini_path.split("/")[-1])
 
             if not ta.current_profile.has_bikini:
-                preds, logitss = beauty_model.inference_pathlist(ta.current_profile.image_paths)
-                ta.current_profile.beautyscore = preds.count("hot") / len(preds)
+                preds, logitss = like_model.inference_pathlist(ta.current_profile.image_paths, softmax=True)
+                ta.current_profile.likescore = preds.count(like_model.classes[1]) / len(preds)
             
             print(ta.current_profile)
             #ta.current_profile.show_images()
@@ -87,5 +87,8 @@ with Controller(ta) as controller:
             reset_counter +=1
             print("error... resetting",reset_counter)
             ta.reset()
+
+# %%
+
 
 

@@ -150,11 +150,13 @@ class TinderAutomator():
         #options.add_argument("user-data-dir=chromedata")
         if self.chromedata_path is not None:
             options.add_argument("--user-data-dir="+self.chromedata_path)
+            print(f"Starting browsr wit user data at {self.chromedata_path}")
         options.add_argument("--disable-dev-shm-usage")
         if self.headless:
             options.add_argument("--headless")
         browser = webdriver.Chrome(options=options)
         self.browser = browser
+        self.reset()
 
     def wait(self, sec):
         time.sleep(sec*SLEEP_MULTIPLIER)
@@ -289,7 +291,7 @@ class TinderAutomator():
     
      #define left and right button
     def find_swipe_buttons(self):
-        found = False
+        found_all = False
         try:
             for btn in self.browser.find_elements(By.TAG_NAME, "button"):
                 if btn.text =="NEIN":
