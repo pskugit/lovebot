@@ -89,19 +89,18 @@ class Controller(StateMachine):
 class Profile():
     def __init__(self, open_card_infos):
         # set via open_card()
-        #name, age, distance, checksum
-        self.infos = open_card_infos
+        self.infos = open_card_infos # (name, age, distance, checksum)
         # set via scrape_images()
         self.pic_count = None 
         self.image_paths = None 
-        # set via evaluate_images()
+        # set via model results in main script
         self.has_bikini = None 
         self.likescore = None 
-        # set via ta.evaluate()
+        # set via on_choice()
         self.choice = None 
     
     def __str__(self):
-        return f"{self.infos[0]}_{self.infos[1]}_{self.infos[2]}_{self.infos[3]}\n\npic_count: {self.pic_count}\nbikini pic: {self.has_bikini}\nlikescore: {self.likescore}\n\nchoice: {self.choice}".replace("-","\n")
+        return f"{self.infos[0]}_{self.infos[1]}_{self.infos[2]}_{self.infos[3]}\n\npic_count: {self.pic_count}\nbikini pic: {self.has_bikini}\nlikescore: {self.likescore}".replace("-","\n")
         #return f"name: {self.infos[0]}\nage: {self.infos[1]}\ndistance: {self.infos[2]}\n\npic_count: {self.pic_count}\nimage_paths: -{'-'.join(self.image_paths)}\n\nbikini pic: {self.has_bikini}\nlikescore: {self.likescore}\n\nchoice: {self.choice}".replace("-","\n")
 
     def show_images(self):
@@ -116,6 +115,7 @@ class Profile():
     
     def evaluate(self, score_threshold=0.5):
         self.choice = "left"
+        # distance > 1000 km
         if self.infos[2] > 1000:
             self.choice = "left"
             print(f"Evaluated choice to {self.choice} because of distance")

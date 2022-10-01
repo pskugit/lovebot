@@ -14,3 +14,4 @@ seaborn
 scikit-learn
 scikit-image
 python-dotenv
+onnxruntime

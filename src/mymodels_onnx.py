@@ -1,38 +1,30 @@
 import numpy as np
 from PIL import Image
 
-import torch
+import onnxruntime as ort
 import torchvision
-import torchvision.models
 import torch.nn.functional as F
-cuda_device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-cuda_device, torch.cuda.is_available(),torch.__version__, torch.version.cuda
+from src.utils import softmax
 
 class ImageModel():
-    def __init__(self, model_path, device="auto"):
-        if device=="auto":
-            self.device = self.get_cuda_device()
+    def __init__(self, model_path):
         self.model_path = model_path
         if not model_path:
-            raise AttributeError("weights_path for ImageModel not specified")
-        self._load_weights()
-        self.net.to(self.device)
-        self.net.eval()
-        
-    def _load_weights(self):
-        self.net.load_state_dict(torch.load(self.model_path, map_location=torch.device('cpu')))
-        
+            raise AttributeError("model_path for ImageModel not specified")
+        self.ort_sess = ort.InferenceSession(model_path)#, providers=['CUDAExecutionProvider'])
+        print("ONNX model running on",ort.get_device())
+               
     def inference(self, image, return_logits=False, apply_softmax=False):
-        with torch.no_grad():
-            img_tensor = self.data_transforms(image).unsqueeze(0).to(self.device)
-            logits = self.net(img_tensor)
-            if apply_softmax:
-                logits = F.softmax(logits)
-            pred_class = np.argmax(logits.cpu(),axis=1).item()
-            if return_logits:
-                return self.classes[pred_class], logits.cpu()
-            else:
-                return self.classes[pred_class]
+        img_tensor = self.data_transforms(image).unsqueeze(0)
+        logits = self.ort_sess.run(["output"], {'input': img_tensor.numpy()})[0]
+        print(logits)
+        if apply_softmax:
+            logits = softmax(logits)
+        pred_class = np.argmax(logits,axis=1).item()
+        if return_logits:
+            return self.classes[pred_class], logits
+        else:
+            return self.classes[pred_class]
 
     def inference_pathlist(self,pathlist,verbose=True, apply_softmax=False):
         preds = []
@@ -49,12 +41,9 @@ class ImageModel():
     def load_image(self, path):
         #print("loading...", path)
         return Image.open(path)
-    
-    def get_cuda_device(self):
-        return torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 class BikiniModel(ImageModel):
-    def __init__(self, model_path="", device="auto"):
+    def __init__(self, model_path=""):
         self.crop_size = 448
         self.data_transforms = torchvision.transforms.Compose([
             torchvision.transforms.Resize(self.crop_size),
@@ -63,12 +52,10 @@ class BikiniModel(ImageModel):
             torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225] )])
         self.classes = ("no_bikini","bikini")
     
-        self.net = torchvision.models.wide_resnet50_2(num_classes=1000, weights=None)
-        self.net.fc = torch.nn.Linear(2048, len(self.classes))
-        super().__init__(model_path, device)
+        super().__init__(model_path)
 
 class LikeModel(ImageModel):
-    def __init__(self, model_path="", device="auto"):
+    def __init__(self, model_path=""):
         self.crop_size = 448
         self.data_transforms = torchvision.transforms.Compose([
             torchvision.transforms.Resize(self.crop_size),
@@ -77,9 +64,7 @@ class LikeModel(ImageModel):
             torchvision.transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225] )])
         self.classes = ("dislike","like")
     
-        self.net = torchvision.models.wide_resnet50_2(num_classes=1000, weights=None)
-        self.net.fc = torch.nn.Linear(2048, len(self.classes))
-        super().__init__(model_path, device)
+        super().__init__(model_path)
 
 TRAINED_MODELS = {
     "bikini": BikiniModel,

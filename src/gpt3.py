@@ -17,7 +17,7 @@ class Gpt3():
           engine="text-davinci-002",#"text-curie-001",
           prompt=prompt,
           temperature=temperature,
-          max_tokens=64,
+          max_tokens=96,
           frequency_penalty=0,
           top_p=1,
           presence_penalty=0,
