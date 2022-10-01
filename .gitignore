@@ -5,3 +5,4 @@ memory/gpt_allowance.csv
 access_tokens/*
 src/__pycache__/
 __pycache__
+oauth/*
