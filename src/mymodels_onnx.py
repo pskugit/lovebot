@@ -15,7 +15,7 @@ class ImageModel():
     def inference(self, image, return_logits=False, apply_softmax=False):
         img_tensor = self.data_transforms(image).unsqueeze(0)
         logits = self.ort_sess.run(["output"], {'input': img_tensor.numpy()})[0]
-        print(logits)
+        #print(logits)
         if apply_softmax:
             logits = softmax(logits)
         pred_class = np.argmax(logits,axis=1).item()

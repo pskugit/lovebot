@@ -59,13 +59,13 @@ logger.info("Remaining Tokens for today: "+str(gpt.allowance.get_tokens()))
 gpt_dryrun=False
 msg_dryrun=False
 
-min_date = pd.Timestamp.today()-pd.Timedelta(days=90)
+min_date = pd.Timestamp.today()-pd.Timedelta(days=60)
 
 
 # %%
 start = 0
 limit = 25
-no_reply_limit = 5
+no_reply_limit = 10
 
 with Controller(ta) as controller:
     # collect matches

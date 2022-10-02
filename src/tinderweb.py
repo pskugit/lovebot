@@ -353,9 +353,7 @@ class TinderAutomator():
         for i, picture in enumerate(pictures):
             self.wait(0.1) 
             filename = f"{name}_{age}_{distance}_{checksum}_{i}".replace(" ", "")
-
             pic = picture.find_element(By.CLASS_NAME, "profileCard__slider__img")
-
             # get url and extension
             url = pic.value_of_css_property("background-image")[5:-2]
             if ".webp" in url:
