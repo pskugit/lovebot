@@ -17,8 +17,12 @@ class Backlog():
         self.path = path
         self.load()
         
-    def load(self):    
-        self.data = pd.read_csv(self.path, index_col=0)
+    def load(self): 
+        # Todo: if no file exists, create file
+        try:
+            self.data = pd.read_csv(self.path, index_col=0)
+        except FileNotFoundError:
+            print("Warning: Backlog not found in {self.path}")
     
     def update_with_tasks(self, tasks):
         tasks = pd.DataFrame.from_dict(tasks, orient="index")

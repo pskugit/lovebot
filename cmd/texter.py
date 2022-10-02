@@ -26,6 +26,7 @@ config.read(os.environ["LOVEBOT_CONFIG"])
 # %%
 SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
 path_prefix = config['DEFAULT']["PathPrefix"]
+name_me = config['DEFAULT']["Name"]
 
 # %%
 logger = logging.getLogger('TA')
@@ -59,7 +60,7 @@ gpt_dryrun=False
 msg_dryrun=False
 
 min_date = pd.Timestamp.today()-pd.Timedelta(days=90)
-name_me = "Chris"
+
 
 # %%
 start = 0
@@ -208,14 +209,3 @@ if manual:
     for rep in reply.split("\n"):
         ta.write_message(rep.strip("\"\'"), dryrun=msg_dryrun)
         time.sleep(3)
-
-# %%
-#import src.gpt3
-#importlib.reload(src.gpt3)
-#from src.gpt3 import Gpt3
-#gpt = Gpt3()
-
-# %%
-
-
-

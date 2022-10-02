@@ -1,16 +1,12 @@
 -e .
 ipykernel
-pandas
+python-dotenv
 python-statemachine
+pandas
 openai
 selenium
-scipy
 chromedriver_autoinstaller
+Pillow
 torchvision
 matplotlib
-seaborn
-scikit-learn
-scikit-image
-python-dotenv
 onnxruntime
-Pillow

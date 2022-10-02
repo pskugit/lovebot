@@ -6,7 +6,6 @@ import math
 import numpy as np
 import pandas as pd
 import logging
-import scipy.interpolate as si
 import pickle
 
 import chromedriver_autoinstaller
@@ -150,7 +149,7 @@ class TinderAutomator():
         #options.add_argument("user-data-dir=chromedata")
         if self.chromedata_path is not None:
             options.add_argument("--user-data-dir="+self.chromedata_path)
-            print(f"Starting browsr wit user data at {self.chromedata_path}")
+            print(f"Starting browser with user data at {self.chromedata_path}")
         options.add_argument("--disable-dev-shm-usage")
         if self.headless:
             options.add_argument("--headless")
