@@ -1,13 +1,14 @@
 # -*- coding: utf-8 -*-
 import os
 import time
+import random
 import pandas as pd
 import logging
 from dotenv import load_dotenv
 load_dotenv()
 
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
-from src.data_interface import Backlog
+from src.data_interface import Backlog, STATUS_CODE, STATUS_CODE_INV
 from src.gpt3 import Gpt3, Allowance
 
 import configparser
@@ -64,6 +65,8 @@ def main():
         logger.info("Open tasks: %d", sum(backlog.data.Status <= 10))
         try:
             for count, (id_, task) in enumerate(backlog.data[(backlog.data.Status < 10)][start:start+limit].iterrows()):
+                # reset temporary variables
+                double_down = False
                 # todo: same loop for erronous matches plus a coounter to indicate the retry count
                 logger.info("-------------------------------------------------")
                 logger.info("------------------Processing Nr. %d------------------", count+1)
@@ -94,25 +97,17 @@ def main():
                     logger.info(f"------------------Status: Erronous. ErrorCount:{errorcount}")
                     continue
 
+                # get conversation 
+                myturn, is_doubled_down, conversation = ta.get_conversation()
+                msg_count = len(conversation)
+
                 ### CHECK NACH ABBRUCHBEDINGUNGEN
                 # is the match still relevant?
                 if (match_date < min_date):
                     backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["EXPIRED"]
                     logger.info("------------------Status: Expired.")
                     continue
-                # is it my turn to send a message?    
-                myturn, conversation = ta.get_conversation()
-                msg_count = len(conversation)
-                backlog.data.loc[id_,"msg_count"] = msg_count
-                if not myturn:
-                    logger.info("------------------Status: Running. Still no reply...")
-                    #Todo: check if last message is older than 2days
-                    #Todo: if so, set extra_shot to true 
-                    # else check no_reply_counter and 'continue'
-                    no_reply_counter +=1
-                    if no_reply_counter > no_reply_limit:
-                        break
-                    continue
+                
                 # is the conversation ready for manual control?
                 if msg_count >= 15:
                     backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["DONE"]
@@ -122,13 +117,30 @@ def main():
                     new_done += 1
                     continue
 
+                # is it my turn to send a message?    
+                backlog.data.loc[id_,"msg_count"] = msg_count
+                if not myturn:
+                    logger.info("------------------Status: Running. Still no reply...")
+                    #Todo: check if last message is older than 2days
+                    #Todo: if so, set extra_shot to true 
+                    # else check no_reply_counter and 'continue'
+                    no_reply_counter +=1
+                    if no_reply_counter > no_reply_limit:
+                        break
+                    if (random.random() < 0.05) and not is_doubled_down and (msg_count >= 5):
+                        print("...doubling down...")
+                        double_down = True
+                    else:
+                        continue
+
                 ### INITIATE OR CONTINUE CONVERSATION
                 logger.info("------------------Status: Running. Conversing...")
                 # build prompt
                 if msg_count==0:
                     prompt = gpt.build_prompt(bio, name_them, name_me, initial=True)
                 else:
-                    prompt = gpt.build_prompt(conversation, name_them, name_me, initial=False)
+                    prompt = gpt.build_prompt(conversation, name_them, name_me, initial=False, double_down=double_down, last_n=0)
+                        
                 logger.info("::PROMPT::")
                 logger.info(prompt)
                 # get gpt response (also updates token allowance)

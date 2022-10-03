@@ -37,7 +37,7 @@ class Gpt3():
             text += "\n"
         return text
     
-    def build_prompt(self, conversation, name_them, name_me=NAME_ME, initial=True, extra_shot=False, last_n=0):
+    def build_prompt(self, conversation, name_them, name_me=NAME_ME, initial=True, double_down=False, last_n=0):
         """if initial == True, it expects the "conversation" to be a bio, else the body shall be a conversation with the custom "conversation structure"""
         primer1 = f"This is a Tinder chat between {name_me} from Berlin and {name_them}.\n"
 
@@ -49,7 +49,7 @@ class Gpt3():
         else: 
             body = self._conversation_to_body(conversation, name_them, name_me=NAME_ME, last_n=last_n)
             primer4 = f"{name_me} tends to ask witty entertaining questions relating to the ongoing conversation and aims to shedule a date with {name_them}.\n"
-            if extra_shot:
+            if double_down:
                 primer5 = f"Since {name_them} has not yet replied to {name_me}'s message, {name_me} continues with a more straightforward approach.\n"
                 prompt = f"{primer1}{primer4}\n{body}\n{primer5}{name_me}:"
             else:

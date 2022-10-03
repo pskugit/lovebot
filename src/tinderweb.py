@@ -244,7 +244,8 @@ class TinderAutomator():
                 hearted = None
             conversation.append((theirs, hearted, message_text))
         myturn = True if not messeges else (conversation[-1][0] or conversation[-1][1])
-        return myturn, conversation
+        is_doubled_down = (len(conversation) > 3) * conversation[-1][0] * conversation[-1][0]
+        return myturn, is_doubled_down, conversation
     
     def write_message(self, text, dryrun=True): 
         if not text:
