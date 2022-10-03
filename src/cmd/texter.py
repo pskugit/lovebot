@@ -1,21 +1,13 @@
 # -*- coding: utf-8 -*-
-import re
 import os
 import time
-import random
-import math
-import numpy as np
 import pandas as pd
-import importlib
 import logging
-from selenium.common.exceptions import *
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.by import By
 from dotenv import load_dotenv
 load_dotenv()
 
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
-from src.data_interface import Backlog, STATUS_CODE, STATUS_CODE_INV
+from src.data_interface import Backlog
 from src.gpt3 import Gpt3, Allowance
 
 import configparser

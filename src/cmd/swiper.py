@@ -40,7 +40,7 @@ def main():
         reset_counter = 0
         target_count = int(config["SCRAPING"]["Count"])
         while (counter < target_count) and (reset_counter < int(config["SCRAPING"]["RetryCount"])):
-            print(f"\n{counter}/{target_count}, errors {reset_counter}")
+            print(f"\n{counter+1}/{target_count}, errors {reset_counter}")
             try:
                 # scrape images
                 controller.scrape(scraping_folder_path)

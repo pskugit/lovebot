@@ -78,7 +78,6 @@ class Controller(StateMachine):
     
     def __enter__(self):
         self.model.start_browser()
-        self.model.reset()
         return self
 
     def __exit__(self, *args): 
