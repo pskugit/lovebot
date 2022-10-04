@@ -233,6 +233,7 @@ class TinderAutomator():
         return tasks
     
     def get_conversation(self):
+        # Todo: make Conversation a class
         conversation = []
         messeges = self.browser.find_elements(By.CLASS_NAME, 'msg')
         for messege in messeges:
@@ -244,7 +245,7 @@ class TinderAutomator():
                 hearted = None
             conversation.append((theirs, hearted, message_text))
         myturn = True if not messeges else (conversation[-1][0] or conversation[-1][1])
-        is_doubled_down = (len(conversation) > 3) * conversation[-1][0] * conversation[-1][0]
+        is_doubled_down =  False if not messeges else (len(conversation) > 3) * conversation[-1][0] * conversation[-2][0]
         return myturn, is_doubled_down, conversation
     
     def write_message(self, text, dryrun=True): 
