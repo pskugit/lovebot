@@ -128,7 +128,23 @@ class Profile():
             self.choice = "right" if self.likescore >= score_threshold else "left"
             print(f"Evaluated choice to {self.choice} because of likescore")
         #self.choice = random.choice(["left", "right"])
-        
+
+class Conversation():
+    def __init__(self, message_list):   
+        self.message_list = message_list
+        self.myturn = True if not message_list else (message_list[-1][0] or message_list[-1][1])
+        self.is_doubled_down =  False if (len(message_list) < 3) else message_list[-1][0] * message_list[-2][0]
+
+    def find_in_conversation(self, searchstring, only_mine=False):
+        """returns the text of the first message of the conversation that contains the searchstring"""
+        for theirs, hearted, message_text in self.message_list:
+            if not (only_mine and theirs):
+                if searchstring in message_text:
+                    return message_text
+        return ""
+
+    def __len__(self):
+        return len(self.message_list)
 
 class TinderAutomator():  
     def __init__(self, initial_state="swiping", startpage="https://tinder.com/app/recs", chromedata_path="chromedata", headless=False):
@@ -199,7 +215,7 @@ class TinderAutomator():
         """type can be 'matches' or 'conversations'"""
         class_name_dict = {
             "matches": 'Ell',
-            "conversations": 'messageListItem__name',
+            "running_conversations": 'messageListItem__name',
         }
         matches = {}
         for i, mli in enumerate(match_or_messageListItems):
@@ -228,13 +244,13 @@ class TinderAutomator():
         self.wait(0.5)
         self.find_btn("Nachrichten").click()
         messageListItem = self.browser.find_elements(By.CLASS_NAME, 'messageListItem')
-        conversations = self._get_new("conversations",messageListItem)
-        tasks = {**new_matches, **conversations}
+        running_conversations = self._get_new("running_conversations",messageListItem)
+        tasks = {**new_matches, **running_conversations}
         return tasks
     
     def get_conversation(self):
         # Todo: make Conversation a class
-        conversation = []
+        message_list = []
         messeges = self.browser.find_elements(By.CLASS_NAME, 'msg')
         for messege in messeges:
             message_text = messege.text        
@@ -243,10 +259,10 @@ class TinderAutomator():
                 hearted = messege.find_element(By.XPATH, "../..").find_elements(By.CSS_SELECTOR, '[role="checkbox"]')[0].get_attribute("aria-checked")
             except IndexError:
                 hearted = None
-            conversation.append((theirs, hearted, message_text))
-        myturn = True if not messeges else (conversation[-1][0] or conversation[-1][1])
-        is_doubled_down =  False if not messeges else (len(conversation) > 3) * conversation[-1][0] * conversation[-2][0]
-        return myturn, is_doubled_down, conversation
+            message_list.append((theirs, hearted, message_text))
+        
+        conversation = Conversation(message_list)        
+        return conversation
     
     def write_message(self, text, dryrun=True): 
         if not text:

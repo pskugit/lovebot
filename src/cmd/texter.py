@@ -18,6 +18,7 @@ config.read(os.environ["LOVEBOT_CONFIG"])
 SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
 path_prefix = config['DEFAULT']["PathPrefix"]
 name_me = config['DEFAULT']["Name"]
+manual_overtake_symbol = config['TEXTING']["ManualOvertakeSymbol"]
 
 logger = logging.getLogger('TA')
 logger.setLevel(logging.INFO)
@@ -52,6 +53,7 @@ def main():
     no_reply_limit = 5
 
     with Controller(ta) as controller:
+        start_time = str(time.ctime())
         # collect matches
         time.sleep(4)
         tasks = ta.generate_tasklist()
@@ -98,7 +100,7 @@ def main():
                     continue
 
                 # get conversation 
-                myturn, is_doubled_down, conversation = ta.get_conversation()
+                conversation = ta.get_conversation()
                 msg_count = len(conversation)
 
                 ### CHECK NACH ABBRUCHBEDINGUNGEN
@@ -117,9 +119,14 @@ def main():
                     new_done += 1
                     continue
 
+                # was manual control triggered? Manuel overtrake code in config
+                if conversation.find_in_conversation(manual_overtake_symbol, only_mine=True):
+                    backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["MANUAL"]
+                    continue
+
                 # is it my turn to send a message?    
                 backlog.data.loc[id_,"msg_count"] = msg_count
-                if not myturn:
+                if not conversation.myturn:
                     logger.info("------------------Status: Running. Still no reply...")
                     #Todo: check if last message is older than 2days
                     #Todo: if so, set extra_shot to true 
@@ -127,7 +134,7 @@ def main():
                     no_reply_counter +=1
                     if no_reply_counter > no_reply_limit:
                         break
-                    if (random.random() < 0.05) and not is_doubled_down and (msg_count >= 5):
+                    if (random.random() < 0.05) and not conversation.is_doubled_down and (msg_count >= 5):
                         print("...doubling down...")
                         double_down = True
                     else:
@@ -140,23 +147,24 @@ def main():
                     prompt = gpt.build_prompt(bio, name_them, name_me, initial=True)
                 else:
                     prompt = gpt.build_prompt(conversation, name_them, name_me, initial=False, double_down=double_down, last_n=0)
-                        
                 logger.info("::PROMPT::")
                 logger.info(prompt)
                 # get gpt response (also updates token allowance)
                 reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, dryrun=gpt_dryrun)
                 # post processing
                 reply = reply.strip("\"\'")
+                # avoid accidental manal overtake
+                reply = reply.replace(manual_overtake_symbol,"") 
                 logger.info("::GPT::")
                 logger.info(reply)
                 ta.write_message(reply, dryrun=msg_dryrun)
-                # handled successfully
                 time.sleep(3)
 
             # Create run report
-            run_report_base = "Run from "+str(time.ctime())+f"\nProcessed {count+1} matches.\n{gpt.allowance.get_tokens()} tokes remaining for today.\nOpen conversations: {len(backlog.data[backlog.data.Status <= 1])}"
+            run_report_base = "Run from "+start_time+f"\nI checked on {count+1} matches.\n{gpt.allowance.get_tokens()} GPT tokes remaining for today.\nOpen conversations: {len(backlog.data[backlog.data.Status <= 1])}"
             run_report = run_report_header + ("\n" * (run_report_header != "")) + run_report_base
             logger.info(run_report)
+        
         finally:
             #update backlog
             backlog.save()
@@ -167,7 +175,7 @@ def main():
     #    TO = config['EMAIL']['receiver']
     #    yag.send(TO, "New Conversation finished",run_report, attachments=['../logs/run.log'])
     #    print(run_report)
-    return True
+    return run_report
     
 if __name__ == "__main__":
     main()

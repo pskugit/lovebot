@@ -1,9 +1,10 @@
 import os
 import openai
 import pandas as pd
+from dotenv import load_dotenv
+load_dotenv()
 openai.api_key = os.environ["OPENAI_API_KEY"]
-
-NAME_ME = "Chris"
+DEFAULT_NAME_ME = "Kim"
 
 class Gpt3():
     def __init__(self, allowance=None):
@@ -28,16 +29,16 @@ class Gpt3():
             self.allowance.decrement()   
         return reply
     
-    def _conversation_to_body(self, conversation, name_them, name_me=NAME_ME, last_n=0):
+    def _conversation_to_body(self, conversation, name_them, name_me=DEFAULT_NAME_ME, last_n=0):
         text = ""
-        for myturn, hearted, message in conversation[-last_n:]:
+        for myturn, hearted, message in conversation.message_list[-last_n:]:
             text += name_them if myturn else name_me
             text += ": "
             text += '"'+message+'"'
             text += "\n"
         return text
     
-    def build_prompt(self, conversation, name_them, name_me=NAME_ME, initial=True, double_down=False, last_n=0):
+    def build_prompt(self, conversation, name_them, name_me=DEFAULT_NAME_ME, initial=True, double_down=False, last_n=0):
         """if initial == True, it expects the "conversation" to be a bio, else the body shall be a conversation with the custom "conversation structure"""
         primer1 = f"This is a Tinder chat between {name_me} from Berlin and {name_them}.\n"
 
@@ -47,7 +48,7 @@ class Gpt3():
             primer3 = f"\n\n{name_me} asks a witty question relating to her profile:"
             prompt = primer1+primer2+conversation+primer3
         else: 
-            body = self._conversation_to_body(conversation, name_them, name_me=NAME_ME, last_n=last_n)
+            body = self._conversation_to_body(conversation, name_them, name_me=DEFAULT_NAME_ME, last_n=last_n)
             primer4 = f"{name_me} tends to ask witty entertaining questions relating to the ongoing conversation and aims to shedule a date with {name_them}.\n"
             if double_down:
                 primer5 = f"Since {name_them} has not yet replied to {name_me}'s message, {name_me} continues with a more straightforward approach.\n"

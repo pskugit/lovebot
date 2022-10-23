@@ -6,7 +6,8 @@ STATUS_CODE = {0: "NEW",
               2: "ERRONOUS",
               10: "DONE",
               11: "EXPIRED",
-              12: "FAILED"
+              12: "FAILED",
+              13: "MANUAL"
               }
 
 STATUS_CODE_INV = {v: k for k, v in STATUS_CODE.items()}      

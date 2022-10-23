@@ -36,6 +36,7 @@ def main():
 
     # setup controller and start the process
     with Controller(ta) as controller:
+        start_time = str(time.ctime())
         counter = 0
         reset_counter = 0
         target_count = int(config["SCRAPING"]["Count"])
@@ -66,7 +67,9 @@ def main():
                 reset_counter +=1
                 print("error... resetting",reset_counter)
                 ta.reset()
-    return True
+    
+    run_report = "Run from "+start_time+f"\nI swiped on {counter} matches for you.\nGood luck!"
+    return run_report
 
 if __name__ == "__main__":
     main()
