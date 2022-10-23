@@ -11,14 +11,14 @@ class Gpt3():
         self.allowance = allowance
         pass
         
-    def request(self, prompt,stop_sequences, temperature=0.7, dryrun=False):
+    def request(self, prompt,stop_sequences, temperature=0.7, max_tokens=128, dryrun=False):
         if dryrun:
             return "This is a test reply in order to save API Tokens"
         response = openai.Completion.create(
           engine="text-davinci-002",#"text-curie-001",
           prompt=prompt,
           temperature=temperature,
-          max_tokens=96,
+          max_tokens=max_tokens,
           frequency_penalty=0,
           top_p=1,
           presence_penalty=0,

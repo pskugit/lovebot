@@ -111,7 +111,7 @@ def main():
                     continue
                 
                 # is the conversation ready for manual control?
-                if msg_count >= 15:
+                if msg_count >= 12:
                     backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["DONE"]
                     logger.info("------------------Status: Done. Message count reached! Yeay!")
                     logger.info(gpt._conversation_to_body(conversation,name_them))
@@ -150,7 +150,7 @@ def main():
                 logger.info("::PROMPT::")
                 logger.info(prompt)
                 # get gpt response (also updates token allowance)
-                reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, dryrun=gpt_dryrun)
+                reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, max_tokens=200, dryrun=gpt_dryrun)
                 # post processing
                 reply = reply.strip("\"\'")
                 # avoid accidental manal overtake
