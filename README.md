@@ -17,7 +17,7 @@ export LOVEBOT_PATH=#path to repository#
 ```
 
 
-3. Download classification models from [Google Drive](https://drive.google.com/drive/folders/1--AcK0jb6MdYs8x3yeHNzST_9WhN1tHY?usp=share_link)
+3. Download .onnx models from [Google Drive](https://drive.google.com/drive/folders/1--AcK0jb6MdYs8x3yeHNzST_9WhN1tHY?usp=share_link)
 
 4. Create Openai API key by registering an Account [here](https://openai.com/api/).
 
