@@ -11,11 +11,10 @@ An App to automate swiping and texting on Tinder.
 pip install -r requirements.txt
 ```
 
-2. Set the ```LOVEBOT_PATH``` environemt variable via
+2. Set the ```LOVEBOT_PATH``` environemt variable. (alternatively, you may create an .env file and place it in the top level of the cloned repository)
 ```bash
 export LOVEBOT_PATH=#path to repository#
 ```
- alternatively, you may create an .env file and place it in the top level of the cloned repository
 
 
 3. Download classification models from 
