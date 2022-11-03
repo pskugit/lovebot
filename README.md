@@ -1,23 +1,16 @@
-# lovebot
+## Setup
 
-![](/assets/logo_small_centered.png?raw=true "Logo")
-
-
-Foobar is a Python library for dealing with word pluralization.
-
-## Installation
-
-Clone repository
-
-Install requirements
+1. Install python requirements
 ```bash
 pip install -r requirements.txt
 ```
 
-create .env file or add config path as ENV variable
+Set the ```LOVEBOT_PATH``` environemt variable via
+```bash
+export LOVEBOT_PATH=#path to repository#
 ```
-LOVEBOT_PATH=#add path to repository#
-```
+ alternatively, you may create an .env file and place it in the top level of the cloned repository
+
 
 Download classification models
 
@@ -28,23 +21,10 @@ specify config file
 
 ## Usage
 
-```python
-import foobar
-
-# returns 'words'
-foobar.pluralize('word')
-
-# returns 'geese'
-foobar.pluralize('goose')
-
-# returns 'phenomenon'
-foobar.singularize('phenomena')
+```bash
+python app.py
 ```
 
-## Contributing
-Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
-
-Please make sure to update tests as appropriate.
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
