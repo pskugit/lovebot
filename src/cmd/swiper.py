@@ -17,6 +17,7 @@ def main():
     SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
     path_prefix = config['DEFAULT']["PathPrefix"]
     scraping_folder_path = config['SCRAPING']["ScrapingFolder"]
+    os.makedirs(scraping_folder_path, exist_ok=True)
 
     # setup logger
     logger = logging.getLogger('TA')
@@ -32,6 +33,7 @@ def main():
 
     # initialize models
     bikini_model = TRAINED_MODELS["bikini"](model_path=config["MODELS"]["Bikini"])
+    os.makedirs(scraping_folder_path+"/bikini", exist_ok=True)
     like_model = TRAINED_MODELS["like"](model_path=config["MODELS"]["Like"])
 
     # setup controller and start the process
