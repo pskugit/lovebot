@@ -2,13 +2,12 @@ import os
 import openai
 import pandas as pd
 from dotenv import load_dotenv
-load_dotenv()
-openai.api_key = os.environ["OPENAI_API_KEY"]
 DEFAULT_NAME_ME = "Kim"
 
 class Gpt3():
-    def __init__(self, allowance=None):
+    def __init__(self, openai_api_key, allowance):
         self.allowance = allowance
+        openai.api_key = openai_api_key
         pass
         
     def request(self, prompt,stop_sequences, temperature=0.7, max_tokens=128, dryrun=False):

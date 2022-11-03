@@ -19,6 +19,7 @@ SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
 path_prefix = config['DEFAULT']["PathPrefix"]
 name_me = config['DEFAULT']["Name"]
 manual_overtake_symbol = config['TEXTING']["ManualOvertakeSymbol"]
+openai_api_key = config['MODELS']["OpenAI"]
 
 logger = logging.getLogger('TA')
 logger.setLevel(logging.INFO)
@@ -40,7 +41,7 @@ allowance = Allowance(path=path_prefix+"memory/gpt_allowance.csv")
 backlog = Backlog(path=path_prefix+"memory/backlog.csv")
 
 # initialize Gpt3
-gpt = Gpt3(allowance)
+gpt = Gpt3(openai_api_key, allowance)
 logger.info("Remaining Tokens for today: "+str(gpt.allowance.get_tokens()))
 gpt_dryrun=False
 msg_dryrun=False
