@@ -25,6 +25,7 @@ logger = logging.getLogger('TA')
 logger.setLevel(logging.INFO)
 # create file handler which logs even debug messages
 timestr = time.strftime("%Y%m%d-%H%M")
+os.makedirs(path_prefix+"logs", exist_ok=True)
 logging_file_name = f'logs/texter_run_{timestr}.log'
 fh = logging.FileHandler(path_prefix+logging_file_name, 'w', 'utf-8')
 fh.setLevel(logging.INFO)
