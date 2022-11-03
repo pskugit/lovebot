@@ -1,6 +1,6 @@
 # lovebot
 
-![](/assets/data.png?raw=true "Dataset")
+![](/assets/logo_small_centered.png?raw=true "Logo")
 
 
 Foobar is a Python library for dealing with word pluralization.
