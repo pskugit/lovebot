@@ -1,6 +1,7 @@
+
 ![](/assets/logo_small_centered.png?raw=true "Logo")
 
-Welcome to Lovebot.
+Welcome to Lovebot:
 An App to automate swiping and texting on Tinder.
 
 ## Setup
@@ -10,22 +11,29 @@ An App to automate swiping and texting on Tinder.
 pip install -r requirements.txt
 ```
 
-Set the ```LOVEBOT_PATH``` environemt variable via
+2. Set the ```LOVEBOT_PATH``` environemt variable via
 ```bash
 export LOVEBOT_PATH=#path to repository#
 ```
  alternatively, you may create an .env file and place it in the top level of the cloned repository
 
 
-Download classification models
+3. Download classification models from 
 
-Create openai API key
+4. Create Openai API key by registering an Account [here](https://openai.com/api/).
 
-specify config file
+5. Add info to the  ```config.ini ``` file
+```
+[MODELS]
+Bikini=#enter path to model#
+Like=#enter path to model#
+OpenAI=#enter openai API key
+```
 
 
 ## Usage
 
+To start the application, simply run
 ```bash
 python app.py
 ```
@@ -33,4 +41,3 @@ python app.py
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
-
