@@ -226,6 +226,8 @@ class TinderAutomator():
                 match_meta["Name"] = mli.find_element(By.CLASS_NAME, class_name_dict[newtype]).text
             except NoSuchElementException:
                 continue
+            if match_meta["Name"] is None:
+                match_meta["Name"] = "UNKNOWN"
             match_meta["Link"] = mli.get_attribute("href")
             id_ = match_meta["Link"].split("/")[-1]
             match_meta["Rank"] = i
