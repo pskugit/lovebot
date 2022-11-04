@@ -40,6 +40,7 @@ def softmax(X, theta = 1.0, axis = None):
 def load_config():
     load_dotenv()
     path_prefix = os.environ["LOVEBOT_PATH"]
+    path_prefix = path_prefix if path_prefix.endswith("/") else path_prefix+"/"
     config = configparser.ConfigParser()
     config_path = path_prefix+"config.ini"
     config.read(config_path)
