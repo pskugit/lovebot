@@ -2,7 +2,7 @@
 ![](/assets/logo_small_centered.png?raw=true "Logo")
 
 Welcome to Lovebot:
-An App to automate swiping and texting on Tinder.
+An app to automate swiping and texting on Tinder.
 
 ## Setup
 
