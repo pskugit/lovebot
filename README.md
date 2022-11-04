@@ -49,6 +49,11 @@ To start the application, simply run
 python app.py
 ```
 
+## Architecture
+
+![](/assets/lovebot_architecture.drawio.png?raw=true "Architektur")
+
+
 
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
