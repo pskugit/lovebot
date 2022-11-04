@@ -32,6 +32,7 @@ logger.info("Remaining Tokens for today: ")
 ta = TinderAutomator(chromedata_path=config['DEFAULT']['ChromeDataPath'])
 
 # initialize allowance
+os.makedirs(path_prefix+"memory", exist_ok=True)
 allowance = Allowance(path=path_prefix+"memory/gpt_allowance.csv")
 
 # initialize backlog
