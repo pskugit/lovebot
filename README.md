@@ -32,7 +32,7 @@ ManualOvertakeSymbol=..
 [SCRAPING]
 Count=20
 RetryCount=3
-ScrapingFolder=#choose path to download scraped imaged#
+ScrapingFolder=#choose path to download scraped images#
 
 [MODELS]
 Bikini=#enter path to model#
