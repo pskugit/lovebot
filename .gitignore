@@ -13,3 +13,4 @@ notebooks/run.log
 src.egg-info/*
 chromedata/*
 chromedata
+config.ini
