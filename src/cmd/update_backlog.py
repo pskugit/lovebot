@@ -10,6 +10,8 @@ from src.utils import load_config
 import configparser
 path_prefix, config = load_config()
 
+expire_all=True
+
 def main():
     # initialize automator
     ta = TinderAutomator(chromedata_path=config['DEFAULT']['ChromeDataPath'])
@@ -24,6 +26,10 @@ def main():
         # update backlog
         backlog.update_with_tasks(tasks)
         print(f"Open tasks: {sum(backlog.data.Status <= 10)}")
+
+        if expire_all:
+            backlog.data.Status = 11
+
         # save backlog
         backlog.save()
     

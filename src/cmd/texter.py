@@ -49,7 +49,7 @@ min_date = pd.Timestamp.today()-pd.Timedelta(days=60)
 def main():
     start = 0
     limit = 25
-    no_reply_limit = 5
+    no_reply_limit = 119
 
     with Controller(ta) as controller:
         start_time = str(time.ctime())
@@ -63,7 +63,12 @@ def main():
         new_done = 0
         no_reply_counter = 0
         logger.info("Remaining tokens: %d",allowance.get_tokens())
-        logger.info("Open tasks: %d", sum(backlog.data.Status <= 10))
+        open_tasks = sum(backlog.data.Status <= 10)
+        logger.info("Open tasks: %d", open_tasks)
+        if open_tasks:
+            logger.info("No new matches or open tasks!")
+            return
+            
         try:
             for count, (id_, task) in enumerate(backlog.data[(backlog.data.Status < 10)][start:start+limit].iterrows()):
                 # reset temporary variables
