@@ -19,7 +19,7 @@ export LOVEBOT_PATH=#path to repository#
 
 4. Create Openai API key by registering an account [here](https://openai.com/api/)
 
-5. Create a ```config.ini``` fily by copying the  ```config_template.ini``` and filling in the necessary information
+5. Create a ```config.ini``` file by copying the  ```config_template.ini``` and filling in the necessary information
 ```
 [DEFAULT]
 ChromeDataPath=#choose chromedata path#
