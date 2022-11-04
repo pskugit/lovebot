@@ -45,7 +45,7 @@ OpenAI=#enter openai API key#
 
 To start the application, simply run
 ```bash
-python app.py
+python app/app.py
 ```
 
 ## Architecture
