@@ -4,19 +4,15 @@ import time
 import random
 import pandas as pd
 import logging
-from dotenv import load_dotenv
-load_dotenv()
 
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
 from src.data_interface import Backlog, STATUS_CODE, STATUS_CODE_INV
 from src.gpt3 import Gpt3, Allowance
+from src.utils import load_config
 
-import configparser
-config = configparser.ConfigParser()
-config.read(os.environ["LOVEBOT_CONFIG"])
+path_prefix, config = load_config()
 
 SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
-path_prefix = config['DEFAULT']["PathPrefix"]
 name_me = config['DEFAULT']["Name"]
 manual_overtake_symbol = config['TEXTING']["ManualOvertakeSymbol"]
 openai_api_key = config['MODELS']["OpenAI"]

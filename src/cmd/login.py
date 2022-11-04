@@ -8,11 +8,13 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from src.tinderweb import TinderAutomator
 from dotenv import load_dotenv
-load_dotenv()
-config = configparser.ConfigParser()
-config.read(os.environ["LOVEBOT_CONFIG"])
 
-path_prefix = config['DEFAULT']["PathPrefix"]
+# read config 
+load_dotenv()
+path_prefix = os.environ["LOVEBOT_PATH"]
+config = configparser.ConfigParser()
+config_path = path_prefix+"config.ini"
+config.read(config_path)
 
 def main():
     # initialize automator and models

@@ -2,17 +2,13 @@
 import os
 import time
 from dotenv import load_dotenv
-load_dotenv()
 
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
 from src.data_interface import Backlog
+from src.utils import load_config
 
 import configparser
-config = configparser.ConfigParser()
-config.read(os.environ["LOVEBOT_CONFIG"])
-
-SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
-path_prefix = config['DEFAULT']["PathPrefix"]
+path_prefix, config = load_config()
 
 def main():
     # initialize automator

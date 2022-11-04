@@ -1,4 +1,7 @@
+import os
 import numpy as np
+import configparser
+from dotenv import load_dotenv
 
 # copied from scikit-learn
 def softmax(X, theta = 1.0, axis = None):
@@ -33,3 +36,11 @@ def softmax(X, theta = 1.0, axis = None):
     # flatten if X was 1D
     if len(X.shape) == 1: p = p.flatten()
     return p
+
+def load_config():
+    load_dotenv()
+    path_prefix = os.environ["LOVEBOT_PATH"]
+    config = configparser.ConfigParser()
+    config_path = path_prefix+"config.ini"
+    config.read(config_path)
+    return path_prefix, config

@@ -1,7 +1,6 @@
 import os
 import openai
 import pandas as pd
-from dotenv import load_dotenv
 DEFAULT_NAME_ME = "Kim"
 
 class Gpt3():

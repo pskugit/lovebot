@@ -3,19 +3,15 @@ import time
 import shutil
 import logging
 import importlib
-import configparser
 
-from dotenv import load_dotenv
 from src.mymodels_onnx import TRAINED_MODELS
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
+from src.utils import load_config
 
 def main():
-    # read config parameters
-    load_dotenv()
-    config = configparser.ConfigParser()
-    config.read(os.environ["LOVEBOT_CONFIG"])
+    path_prefix, config = load_config()
+
     SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
-    path_prefix = config['DEFAULT']["PathPrefix"]
     scraping_folder_path = config['SCRAPING']["ScrapingFolder"]
     os.makedirs(scraping_folder_path, exist_ok=True)
 

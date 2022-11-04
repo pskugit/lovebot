@@ -6,15 +6,10 @@ from src.cmd.update_backlog import main as update_backlog
 from src.cmd.swiper import main as swiper
 from src.cmd.texter import main as texter
 from src.cmd.login import main as login
+from src.utils import load_config
 
-from dotenv import load_dotenv
-import configparser
-
-load_dotenv()
-config = configparser.ConfigParser()
-config.read(os.environ["LOVEBOT_CONFIG"])
+path_prefix, config = load_config()
 loader = QUiLoader()
-path_prefix = config['DEFAULT']["PathPrefix"]
 
 class MyApp(QtWidgets.QApplication):
     def __init__(self):
