@@ -1,4 +1,3 @@
-
 ![](/assets/logo_small_centered.png?raw=true "Logo")
 
 Welcome to Lovebot:
@@ -11,7 +10,7 @@ An app to automate swiping and texting on Tinder.
 pip install -r requirements.txt
 ```
 
-2. Set the ```LOVEBOT_PATH``` environemt variable. (alternatively, you may create an .env file and place it in the top level of the cloned repository)
+2. Set the ```LOVEBOT_PATH``` environemt variable (alternatively, you may create an .env file and place it in the top level of the cloned repository)
 ```bash
 export LOVEBOT_PATH=#path to repository#
 ```
@@ -20,7 +19,7 @@ export LOVEBOT_PATH=#path to repository#
 
 4. Create Openai API key by registering an account [here](https://openai.com/api/)
 
-5. Create a ```config.ini``` fily by copying the  ```config_template.ini``` and filling in the necessary information.
+5. Create a ```config.ini``` fily by copying the  ```config_template.ini``` and filling in the necessary information
 ```
 [DEFAULT]
 ChromeDataPath=#choose chromedata path#
