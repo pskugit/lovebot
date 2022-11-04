@@ -59,14 +59,19 @@ class Allowance():
     def __init__(self, path="gpt_allowance.csv"):
         self.data = pd.DataFrame()
         self.path = path
-        
+        if not os.path.exists(path):
+            with open(self.path,'a') as fd:
+                fd.write("Date,Tokens\n")
+                fd.write(str(pd.Timestamp.today().date())+",50")
+                self.tokens = 50
+
     def read(self):
         self.data = pd.read_csv(self.path, header=0)
         if str(pd.Timestamp.today().date()) == self.data.Date.iloc[-1]:
             self.tokens = self.data.Tokens.iloc[-1]
         else:
             with open(self.path,'a') as fd:
-                fd.write("\n"+str(pd.Timestamp.today().date())+",50")
+                fd.write(str("\n"+pd.Timestamp.today().date())+",50")
                 self.tokens = 50
     
     def get_tokens(self):
