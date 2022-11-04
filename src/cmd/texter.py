@@ -65,10 +65,10 @@ def main():
         logger.info("Remaining tokens: %d",allowance.get_tokens())
         open_tasks = sum(backlog.data.Status <= 10)
         logger.info("Open tasks: %d", open_tasks)
-        if open_tasks:
+        if not open_tasks:
             logger.info("No new matches or open tasks!")
             return
-            
+
         try:
             for count, (id_, task) in enumerate(backlog.data[(backlog.data.Status < 10)][start:start+limit].iterrows()):
                 # reset temporary variables
