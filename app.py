@@ -24,13 +24,11 @@ class MyApp(QtWidgets.QApplication):
 
     @QtCore.Slot()
     def run_swiper(self):
-        #self.ui.status_label.setText("I'm swiping...")
         run_report = swiper()
         self.ui.status_label.setText(run_report)
 
     @QtCore.Slot()
     def run_texter(self):
-        #self.ui.status_label.setText("I'm texting...")
         run_report = texter()
         self.ui.status_label.setText(run_report)
 
@@ -38,6 +36,9 @@ class MyApp(QtWidgets.QApplication):
     def run_login(self):
         login()
         self.ui.status_label.setText("Alright, let's go!")
+    
+    def run_expire_backlog(self):
+        update_backlog(expire_all=True)
 
     def ui_setup(self):
         #central_image
@@ -52,7 +53,7 @@ class MyApp(QtWidgets.QApplication):
         self.ui.swipe_btn.clicked.connect(self.run_swiper)
         self.ui.text_btn.clicked.connect(self.run_texter)
         self.ui.login_btn.clicked.connect(self.run_login)
-
+        self.ui.expire_btn.clicked.connect(self.run_expire_backlog)
 
 if __name__ == "__main__":
     app = MyApp()

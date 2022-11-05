@@ -10,9 +10,7 @@ from src.utils import load_config
 import configparser
 path_prefix, config = load_config()
 
-expire_all=True
-
-def main():
+def main(expire_all=False):
     # initialize automator
     ta = TinderAutomator(chromedata_path=config['DEFAULT']['ChromeDataPath'])
 
