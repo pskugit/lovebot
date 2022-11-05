@@ -7,14 +7,12 @@ from selenium.common.exceptions import *
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from src.tinderweb import TinderAutomator
+from src.utils import load_config
 from dotenv import load_dotenv
 
 # read config 
 load_dotenv()
-path_prefix = os.environ["LOVEBOT_PATH"]
-config = configparser.ConfigParser()
-config_path = path_prefix+"config.ini"
-config.read(config_path)
+path_prefix, config = load_config()
 
 def main():
     # initialize automator and models
@@ -36,7 +34,7 @@ def main():
                 pass
         try:
             ta.browser.title
-            time.sleep(1)
+            time.sleep(0.5)
         except NoSuchWindowException as e:
             print("Window closed.")
             running = False

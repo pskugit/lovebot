@@ -71,7 +71,7 @@ class Allowance():
             self.tokens = self.data.Tokens.iloc[-1]
         else:
             with open(self.path,'a') as fd:
-                fd.write(str("\n"+pd.Timestamp.today().date())+",50")
+                fd.write(str("\n"+str(pd.Timestamp.today().date()))+",50")
                 self.tokens = 50
     
     def get_tokens(self):

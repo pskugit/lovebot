@@ -49,7 +49,7 @@ min_date = pd.Timestamp.today()-pd.Timedelta(days=60)
 def main():
     start = 0
     limit = 25
-    no_reply_limit = 119
+    no_reply_limit = 10
 
     with Controller(ta) as controller:
         start_time = str(time.ctime())
