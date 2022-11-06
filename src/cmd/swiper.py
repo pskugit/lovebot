@@ -62,7 +62,8 @@ def main():
                 controller.choice()
                 counter += 1
                 reset_counter = 0
-            except:
+            except Exception as e:
+                print(e)
                 reset_counter +=1
                 print("error... resetting",reset_counter)
                 ta.reset()
