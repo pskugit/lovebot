@@ -40,4 +40,5 @@ class Backlog():
         self.data = self.data.sort_values("Rank")
 
     def save(self):
+        print("saved backlog")
         self.data.to_csv(self.path)

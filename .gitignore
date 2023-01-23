@@ -1,5 +1,6 @@
 .DS_Store
 .env
+scraping/
 memory/backlog.csv
 memory/gpt_allowance.csv
 access_tokens/*

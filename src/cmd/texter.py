@@ -148,15 +148,15 @@ def main():
                 logger.info("------------------Status: Running. Conversing...")
                 # build prompt
                 if msg_count==0:
-                    prompt = gpt.build_prompt(bio, name_them, name_me, initial=True)
+                    prompt = gpt.build_prompt(conversation, bio, name_them, name_me, initial=True)
                 else:
-                    prompt = gpt.build_prompt(conversation, name_them, name_me, initial=False, double_down=double_down, last_n=0)
+                    prompt = gpt.build_prompt(conversation, bio, name_them, name_me, initial=False, double_down=double_down, last_n=0)
                 logger.info("::PROMPT::")
                 logger.info(prompt)
                 # get gpt response (also updates token allowance)
                 reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, max_tokens=200, dryrun=gpt_dryrun)
                 # post processing
-                reply = reply.strip("\"\'")
+                reply = reply.strip().strip("\"\'")
                 # avoid accidental manal overtake
                 reply = reply.replace(manual_overtake_symbol,"") 
                 logger.info("::GPT::")

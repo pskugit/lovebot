@@ -161,11 +161,12 @@ class TinderAutomator():
         options.add_argument("--window-size=1920,1080")
         options.add_argument('--disable-dev-shm-usage')
         options.add_argument("--start-maximized")
+        options.add_experimental_option("useAutomationExtension", False)
+        options.add_experimental_option("excludeSwitches",["enable-automation"])
         #options.add_argument("user-data-dir=chromedata")
         if self.chromedata_path is not None:
             options.add_argument("--user-data-dir="+self.chromedata_path)
             print(f"Starting browser with user data at {self.chromedata_path}")
-        options.add_argument("--disable-dev-shm-usage")
         if self.headless:
             options.add_argument("--headless")
         browser = webdriver.Chrome(options=options)
@@ -285,8 +286,8 @@ class TinderAutomator():
         try:
             bio = self.browser.find_element(By.CLASS_NAME, 'BreakWord').text
         except (NoSuchElementException, IndexError):
-            #print("Bio is empty. Returning default text.")
-            bio = "Looking for someone interesting. Do you know something fun to experience?"
+            #print("Bio is empty. Returning default text.") #new bahavior handles empty bio in gpt class directly
+            bio = ""#Looking for someone interesting. Do you know something fun to experience?"
         
         # header is the first div in the "chat" element
         header = self.browser.find_element(By.CLASS_NAME, "chat").find_element(By.XPATH, "./div")

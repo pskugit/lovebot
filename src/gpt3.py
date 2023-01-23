@@ -2,6 +2,7 @@ import os
 import openai
 import pandas as pd
 DEFAULT_NAME_ME = "Kim"
+LOCATION_ME = "Berlin"
 
 class Gpt3():
     def __init__(self, openai_api_key, allowance):
@@ -13,7 +14,7 @@ class Gpt3():
         if dryrun:
             return "This is a test reply in order to save API Tokens"
         response = openai.Completion.create(
-          engine="text-davinci-002",#"text-curie-001",
+          engine="text-davinci-003",#"text-curie-001",
           prompt=prompt,
           temperature=temperature,
           max_tokens=max_tokens,
@@ -36,23 +37,27 @@ class Gpt3():
             text += "\n"
         return text
     
-    def build_prompt(self, conversation, name_them, name_me=DEFAULT_NAME_ME, initial=True, double_down=False, last_n=0):
+    def build_prompt(self, conversation, bio, name_them, name_me=DEFAULT_NAME_ME, initial=True, double_down=False, last_n=0):
         """if initial == True, it expects the "conversation" to be a bio, else the body shall be a conversation with the custom "conversation structure"""
-        primer1 = f"This is a Tinder chat between {name_me} from Berlin and {name_them}.\n"
+        primer1 = f"Setting: Dating App. {LOCATION_ME}.\n{name_me} is a chill and educated person who always finds the right words to be attractive to others. \
+            This is a chat between {name_me} and {name_them}. {name_me} has a friendly but straightforward attitude.\n"
+        assert isinstance(bio, str)
+        if not bio:
+            primer2 = f"{name_them}s profile is empty so for now, only the name is known to us and that {name_them} is looking to find someone interesting.\n"
+        else:  
+            primer2 = f"{name_them}s profile says:\n"
 
         if initial:
-            assert isinstance(conversation, str)
-            primer2 = f"{name_them}s profile says:\n"
-            primer3 = f"\n\n{name_me} asks a witty question relating to her profile:"
-            prompt = primer1+primer2+conversation+primer3
+            primer3 = f"{name_me} starts the chat by wittily saying:"
+            prompt = f"{primer1}{primer2}{bio}\n{primer3}"
         else: 
-            body = self._conversation_to_body(conversation, name_them, name_me=DEFAULT_NAME_ME, last_n=last_n)
-            primer4 = f"{name_me} tends to ask witty entertaining questions relating to the ongoing conversation and aims to shedule a date with {name_them}.\n"
+            body = self._conversation_to_body(conversation, name_them, name_me=name_me, last_n=last_n)
+            primer4 = f"{name_me} tends to ask witty entertaining questions relating to {name_them}'s profile and the ongoing conversation and aims to shedule a date with {name_them}.\n"
             if double_down:
                 primer5 = f"Since {name_them} has not yet replied to {name_me}'s message, {name_me} continues with a more straightforward approach.\n"
-                prompt = f"{primer1}{primer4}\n{body}\n{primer5}{name_me}:"
+                prompt = f"{primer1}{primer2}{bio}\n{primer4}\n{body}\n{primer5}{name_me}:"
             else:
-                prompt = f"{primer1}{primer4}\n{body}{name_me}:"
+                prompt = f"{primer1}{primer2}{bio}\n{primer4}\n{body}{name_me}:"
         return prompt
 
 class Allowance():
