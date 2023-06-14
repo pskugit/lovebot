@@ -284,7 +284,7 @@ class TinderAutomator():
              
     def read_match_info(self):
         try:
-            bio = self.browser.find_element(By.CLASS_NAME, 'BreakWord').text
+            bio = self.browser.find_elements(By.CLASS_NAME, 'BreakWord')[-1].text
         except (NoSuchElementException, IndexError):
             #print("Bio is empty. Returning default text.") #new bahavior handles empty bio in gpt class directly
             bio = ""#Looking for someone interesting. Do you know something fun to experience?"

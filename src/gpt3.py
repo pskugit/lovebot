@@ -14,7 +14,7 @@ class Gpt3():
         if dryrun:
             return "This is a test reply in order to save API Tokens"
         response = openai.Completion.create(
-          engine="text-davinci-003",#"text-curie-001",
+          model="gpt-3.5-turbo-0301",
           prompt=prompt,
           temperature=temperature,
           max_tokens=max_tokens,
@@ -48,7 +48,7 @@ class Gpt3():
             primer2 = f"{name_them}s profile says:\n"
 
         if initial:
-            primer3 = f"{name_me} starts the chat by wittily saying:"
+            primer3 = f"{name_me} starts the chat (while not introducing formally) by wittily saying:"
             prompt = f"{primer1}{primer2}{bio}\n{primer3}"
         else: 
             body = self._conversation_to_body(conversation, name_them, name_me=name_me, last_n=last_n)
