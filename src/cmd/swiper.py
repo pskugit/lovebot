@@ -69,6 +69,7 @@ def main():
                 ta.reset()
     
     run_report = "Run from "+start_time+f"\nI swiped on {counter} matches for you.\nGood luck!"
+    logger.info(run_report)
     return run_report
 
 if __name__ == "__main__":

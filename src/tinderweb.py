@@ -130,6 +130,9 @@ class Profile():
         #self.choice = random.choice(["left", "right"])
 
 class Conversation():
+    """Conversation based on a list of following format: [(1,0,"message one"),(0,0,"message two"),(1,0,"message three")]
+    where the tuple contaions (theirs-flag, hearted-flag, text)
+    """
     def __init__(self, message_list):   
         self.message_list = message_list
         self.myturn = True if not message_list else (message_list[-1][0] or message_list[-1][1])
@@ -142,6 +145,9 @@ class Conversation():
                 if searchstring in message_text:
                     return message_text
         return ""
+    
+    def _get_sample_message_list(self):
+        return [(False,0,"message one"),(True,0,"message two"),(False,0,"message three"), (True,0,"message four")]
 
     def __len__(self):
         return len(self.message_list)

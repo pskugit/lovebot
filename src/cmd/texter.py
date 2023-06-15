@@ -7,7 +7,7 @@ import logging
 
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
 from src.data_interface import Backlog, STATUS_CODE, STATUS_CODE_INV
-from src.gpt3 import Gpt3, Allowance
+from src.gpt3 import Gpt3, Allowance, ChatGpt
 from src.utils import load_config
 
 path_prefix, config = load_config()
@@ -39,12 +39,12 @@ allowance = Allowance(path=path_prefix+"memory/gpt_allowance.csv")
 backlog = Backlog(path=path_prefix+"memory/backlog.csv")
 
 # initialize Gpt3
-gpt = Gpt3(openai_api_key, allowance)
+gpt = ChatGpt(openai_api_key, allowance)
 logger.info("Remaining Tokens for today: "+str(gpt.allowance.get_tokens()))
 gpt_dryrun=False
 msg_dryrun=False
 
-min_date = pd.Timestamp.today()-pd.Timedelta(days=60)
+min_date = pd.Timestamp.today()-pd.Timedelta(days=120)
 
 def main():
     start = 0
@@ -118,7 +118,6 @@ def main():
                 if msg_count >= 12:
                     backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["DONE"]
                     logger.info("------------------Status: Done. Message count reached! Yeay!")
-                    logger.info(gpt._conversation_to_body(conversation,name_them))
                     run_report_header = f"Conversation with {name_them} is ready to be taken over! (Nr. {count+1})\n"
                     new_done += 1
                     continue
@@ -154,7 +153,8 @@ def main():
                 logger.info("::PROMPT::")
                 logger.info(prompt)
                 # get gpt response (also updates token allowance)
-                reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, max_tokens=200, dryrun=gpt_dryrun)
+                #reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, max_tokens=200, dryrun=gpt_dryrun)
+                reply = gpt.request(prompt, temperature=0.9, dryrun=False, return_completion_object=False)
                 # post processing
                 reply = reply.strip().strip("\"\'")
                 # avoid accidental manal overtake
