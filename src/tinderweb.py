@@ -2,8 +2,6 @@
 import re
 import time
 import random
-import math
-import numpy as np
 import pandas as pd
 import logging
 import pickle
@@ -11,15 +9,10 @@ import pickle
 import chromedriver_autoinstaller
 chromedriver_autoinstaller.install()
 
-import selenium
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import Select
-from selenium.webdriver.chrome.options import Options
 from selenium.common.exceptions import *
-
 from statemachine import StateMachine, State
 
 import urllib
@@ -27,7 +20,6 @@ from PIL import Image
 from matplotlib import pyplot as plt
 import os
 import re
-
 import ssl
 import socket
 hostname = 'www.python.org'

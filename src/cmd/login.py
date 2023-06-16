@@ -25,7 +25,7 @@ def main():
         if not login_completed:
             try:
                 element = ta.browser.find_element(By.CSS_SELECTOR, '[title="Mein Profil"]')
-                name = element.text
+                name = element.text.split("\n")[1]
                 print("Login successful.")
                 print(f"Hi, {name}!")
                 print("You may close the window now.")

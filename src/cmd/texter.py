@@ -7,13 +7,13 @@ import logging
 
 from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
 from src.data_interface import Backlog, STATUS_CODE, STATUS_CODE_INV
-from src.gpt3 import Gpt3, Allowance, ChatGpt
+from src.gpt import Gpt3, Allowance, ChatGpt
 from src.utils import load_config
 
 path_prefix, config = load_config()
 
 SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
-name_me = config['DEFAULT']["Name"]
+name_me = config['TEXTING']["Name"]
 manual_overtake_symbol = config['TEXTING']["ManualOvertakeSymbol"]
 openai_api_key = config['MODELS']["OpenAI"]
 
