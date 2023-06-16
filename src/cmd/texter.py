@@ -15,6 +15,7 @@ path_prefix, config = load_config()
 SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
 name_me = config['TEXTING']["Name"]
 manual_overtake_symbol = config['TEXTING']["ManualOvertakeSymbol"]
+max_msg_count = config['TEXTING']["MaxMsgCount"]
 openai_api_key = config['MODELS']["OpenAI"]
 
 logger = logging.getLogger('TA')
@@ -115,7 +116,7 @@ def main():
                     continue
                 
                 # is the conversation ready for manual control?
-                if msg_count >= 12:
+                if msg_count >= max_msg_count:
                     backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["DONE"]
                     logger.info("------------------Status: Done. Message count reached! Yeay!")
                     run_report_header = f"Conversation with {name_them} is ready to be taken over! (Nr. {count+1})\n"
