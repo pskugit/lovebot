@@ -22,22 +22,25 @@ export LOVEBOT_PATH=#path to repository#
 5. Create a ```config.ini``` file by copying the  ```config_template.ini``` and filling in the necessary information
 ```
 [DEFAULT]
-ChromeDataPath=#choose chromedata path#
-Name=#your name#
+ChromeDataPath=#choose chromedata path
 SleepTime=2
 
 [TEXTING]
+Name=#your name
+Location=#your location
+PersonalInfo=#your personal info
 ManualOvertakeSymbol=..
+MaxMsgCount=12
 
 [SCRAPING]
 Count=20
 RetryCount=3
-ScrapingFolder=#choose path to download scraped images#
+ScrapingFolder=#choose path to download scraped imaged
 
 [MODELS]
-Bikini=#enter path to model#
-Like=#enter path to model#
-OpenAI=#enter openai API key#
+Bikini=#enter path to model .onnx file
+Like=#enter path to model .onnx file
+OpenAI=#enter openai API key
 ```
 
 
