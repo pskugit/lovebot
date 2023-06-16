@@ -15,7 +15,9 @@ path_prefix, config = load_config()
 SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
 name_me = config['TEXTING']["Name"]
 manual_overtake_symbol = config['TEXTING']["ManualOvertakeSymbol"]
-max_msg_count = config['TEXTING']["MaxMsgCount"]
+max_msg_count = int(config['TEXTING']["MaxMsgCount"])
+personal_info = config['TEXTING']["PersonalInfo"]
+location = config['TEXTING']["Location"]
 openai_api_key = config['MODELS']["OpenAI"]
 
 logger = logging.getLogger('TA')
@@ -89,18 +91,19 @@ def main():
                 # GET BASIC INFORMATION
                 try:
                     bio, match_date = ta.read_match_info()
-                    backlog.data.loc[id_,"ErrorCount"] = 0
+                    backlog.set_ErrorCount(id_,0)
                     #update status
-                    backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["RUNNING"]
+                    backlog.set_Status(id_,STATUS_CODE_INV["RUNNING"])
                 except Exception as e:
                     #logger.info(str(e))
                     logger.info("Some error while fetching match info...")
                     backlog.data.loc[id_,"ErrorCount"] += 1
-                    errorcount= backlog.data.loc[id_,"ErrorCount"]
+                    errorcount= backlog.get_ErrorCount(id_)
                     if errorcount > 10:
-                        backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["FAILED"]
+                        backlog.set_Status(id_,STATUS_CODE_INV["FAILED"])
                     else:
-                        backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["ERRONOUS"]
+                        backlog.set_Status(id_,STATUS_CODE_INV["ERRONOUS"])
+
                     logger.info(f"------------------Status: Erronous. ErrorCount:{errorcount}")
                     continue
 
@@ -111,13 +114,13 @@ def main():
                 ### CHECK NACH ABBRUCHBEDINGUNGEN
                 # is the match still relevant?
                 if (match_date < min_date):
-                    backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["EXPIRED"]
+                    backlog.set_Status(id_,STATUS_CODE_INV["EXPIRED"])
                     logger.info("------------------Status: Expired.")
                     continue
                 
                 # is the conversation ready for manual control?
                 if msg_count >= max_msg_count:
-                    backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["DONE"]
+                    backlog.set_Status(id_,STATUS_CODE_INV["DONE"])
                     logger.info("------------------Status: Done. Message count reached! Yeay!")
                     run_report_header = f"Conversation with {name_them} is ready to be taken over! (Nr. {count+1})\n"
                     new_done += 1
@@ -125,11 +128,11 @@ def main():
 
                 # was manual control triggered? Manuel overtrake code in config
                 if conversation.find_in_conversation(manual_overtake_symbol, only_mine=True):
-                    backlog.data.loc[id_,"Status"] = STATUS_CODE_INV["MANUAL"]
+                    backlog.set_Status(id_,STATUS_CODE_INV["MANUAL"])
                     continue
 
                 # is it my turn to send a message?    
-                backlog.data.loc[id_,"msg_count"] = msg_count
+                backlog.set_MsgCount(id_, msg_count)
                 if not conversation.myturn:
                     logger.info("------------------Status: Running. Still no reply...")
                     #Todo: check if last message is older than 2days
@@ -138,7 +141,7 @@ def main():
                     no_reply_counter +=1
                     if no_reply_counter > no_reply_limit:
                         break
-                    if (random.random() < 0.05) and not conversation.is_doubled_down and (msg_count >= 5):
+                    if (random.random() < 0.05) and not conversation.is_doubled_down and ((time.time() - backlog.get_LastMessageTimestamp) > 86400):
                         print("...doubling down...")
                         double_down = True
                     else:
@@ -147,14 +150,12 @@ def main():
                 ### INITIATE OR CONTINUE CONVERSATION
                 logger.info("------------------Status: Running. Conversing...")
                 # build prompt
-                if msg_count==0:
-                    prompt = gpt.build_prompt(conversation, bio, name_them, name_me, initial=True)
-                else:
-                    prompt = gpt.build_prompt(conversation, bio, name_them, name_me, initial=False, double_down=double_down, last_n=0)
+                intial = msg_count==0
+                prompt = gpt.build_prompt(conversation, bio, name_them, name_me, personal_info, location, initial=intial, double_down=double_down, last_n=0)
                 logger.info("::PROMPT::")
                 logger.info(prompt)
                 # get gpt response (also updates token allowance)
-                #reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, max_tokens=200, dryrun=gpt_dryrun)
+                #WHEN USING OLD GPT ENDPOINT: reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, max_tokens=200, dryrun=gpt_dryrun)
                 reply = gpt.request(prompt, temperature=0.9, dryrun=False, return_completion_object=False)
                 # post processing
                 reply = reply.strip().strip("\"\'")
@@ -162,7 +163,14 @@ def main():
                 reply = reply.replace(manual_overtake_symbol,"") 
                 logger.info("::GPT::")
                 logger.info(reply)
-                ta.write_message(reply, dryrun=msg_dryrun)
+                # if the response has two subsequent newlines, we split it to send to individual messages
+                if "\n\n" in reply:
+                    for r in reply.split("\n\n"):
+                        ta.write_message(r, dryrun=msg_dryrun)
+                        time.sleep(2*SLEEP_MULTIPLIER)
+                else:
+                    ta.write_message(reply, dryrun=msg_dryrun)
+                backlog.set_LastMessageTimestamp(id_)
                 time.sleep(3)
 
             # Create run report
@@ -174,12 +182,14 @@ def main():
             #update backlog
             backlog.save()
 
-    #if new_done:
+    # DEPRECATED LEGACY CODE FOR SENDING EMAILS
+    # if new_done:
     #    import yagmail
     #    yag = yagmail.SMTP(config['EMAIL']['sender'], oauth2_file=path_prefix+config['EMAIL']['OauthFilePath'])
     #    TO = config['EMAIL']['receiver']
     #    yag.send(TO, "New Conversation finished",run_report, attachments=['../logs/run.log'])
     #    print(run_report)
+
     return run_report
     
 if __name__ == "__main__":

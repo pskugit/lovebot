@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import time
 
 STATUS_CODE = {0: "NEW",
               1: "RUNNING",
@@ -39,6 +40,38 @@ class Backlog():
         self.data.Rank = np.where(self.data.Status == STATUS_CODE_INV["ERRONOUS"],-1,self.data.Rank)
         self.data = self.data.sort_values("Rank")
 
+    def set_LastMessageTimestamp(self, id_, timestamp=0):
+        if not timestamp:
+            timestamp = time.time()
+        self.data.loc[id_,"LastMessageTimestamp"] = timestamp
+
+    def get_LastMessageTimestamp(self, id_):
+        return self.data.loc[id_,"LastMessageTimestamp"]
+       
+    def set_MsgCount(self, id_, msg_count):
+        self.data.loc[id_,"msg_count"] = msg_count
+    
+    def get_MsgCount(self, id_):
+        return self.data.loc[id_,"msg_count"]
+
+    def set_Status(self, id_, status):
+        self.data.loc[id_,"Status"] = status
+
+    def get_Status(self, id_):
+        return self.data.loc[id_,"Status"]
+
+    def set_ErrorCount(self, id_, count):
+        self.data.loc[id_,"ErrorCount"] = count  
+
+    def get_ErrorCount(self, id_):
+        return self.data.loc[id_,"ErrorCount"]
+    
+    def set_Rank(self, id_, rank):
+        self.data.loc[id_,"ErrorCount"] = rank  
+
+    def get_Rank(self, id_):
+        return self.data.loc[id_,"ErrorCount"]
+    
     def save(self):
         print("saved backlog")
         self.data.to_csv(self.path)

@@ -4,7 +4,7 @@ import pandas as pd
 
 DEFAULT_NAME_ME = "Kim"
 LOCATION_ME = "Berlin"
-PERSONAL_INFO = ""
+PERSONAL_INFO = "Has a passion for books"
 
 class Allowance():
     def __init__(self, path="gpt_allowance.csv"):
@@ -72,15 +72,13 @@ class ChatGpt(Gpt):
                 gpt_messages.append({"role": role, "content": message})
             return gpt_messages
     
-    def build_prompt(self, conversation, bio, name_them, name_me=DEFAULT_NAME_ME, personal_info=PERSONAL_INFO, initial=True, double_down=False, last_n=0):
+    def build_prompt(self, conversation, bio, name_them, name_me=DEFAULT_NAME_ME, personal_info=PERSONAL_INFO, location=LOCATION_ME, initial=True, double_down=False, last_n=0):
         gpt_messages = []
-
-        """if initial == True, it expects the "conversation" to be a bio, else the body shall be a conversation with the custom "conversation structure"""
-        setting_primer = f"Setting: Dating App. {LOCATION_ME}.\nYou act as {name_me}: A chill and educated person who always finds the right words to be attractive to others \
-            You are chatting with {name_them}, who matched with you on Tinder. {name_me} has a friendly but straightforward attitude.\n\
-            {name_me} tends to ask witty entertaining questions relating to {name_them}'s profile and the ongoing conversation and aims to shedule a date with {name_them}.\n\
-            As {name_me}, you do not need to focus on perfect grammar and sentences. In fact, you are encouraged to talk in a colloquial relateable manner. Emojis may be used when fitting.\n\
-            Only provide the next chat message of any given conversation."
+        setting_primer = f"Setting: Dating App. {location}.\nYou act as {name_me}: A chill and educated person who always finds the right words to be attractive to others \
+You are chatting with {name_them}, who matched with you on Tinder. {name_me} has a friendly but straightforward attitude.\n\
+{name_me} tends to ask witty entertaining questions relating to {name_them}'s profile and the ongoing conversation and aims to shedule a date with {name_them}.\n\
+As {name_me}, you do not need to focus on perfect grammar and sentences. In fact, you are encouraged to talk in a colloquial relateable manner. Avoid full stops. Emojis may be used when fitting.\n\
+Only provide the next chat message of any given conversation."
         gpt_messages.append({"role": "system", "content": setting_primer})
         if personal_info:
             personal_info_str = f"The following aspects may be useful to know about {name_me} when acting as {name_me}:\n"+personal_info
@@ -140,9 +138,8 @@ class Gpt3(Gpt):
             text += "\n"
         return text
     
-    def build_prompt(self, conversation, bio: str, name_them: str, name_me :str=DEFAULT_NAME_ME , initial=True, double_down=False, last_n=0):
-        """if initial == True, it expects the "conversation" to be a bio, else the body shall be a conversation with the custom "conversation structure"""
-        primer1 = f"Setting: Dating App. {LOCATION_ME}.\n{name_me} is a chill and educated person who always finds the right words to be attractive to others. \
+    def build_prompt(self, conversation, bio: str, name_them: str, name_me :str=DEFAULT_NAME_ME , location=LOCATION_ME, initial=True, double_down=False, last_n=0):
+        primer1 = f"Setting: Dating App. {location}.\n{name_me} is a chill and educated person who always finds the right words to be attractive to others. \
             This is a chat between {name_me} and {name_them}. {name_me} has a friendly but straightforward attitude.\n"
         assert isinstance(bio, str)
         if not bio:
