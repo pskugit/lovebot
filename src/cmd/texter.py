@@ -141,7 +141,7 @@ def main():
                     no_reply_counter +=1
                     if no_reply_counter > no_reply_limit:
                         break
-                    if (random.random() < 0.05) and not conversation.is_doubled_down and ((time.time() - backlog.get_LastMessageTimestamp) > 86400):
+                    if (random.random() < 0.05) and not conversation.is_doubled_down and ((time.time() - backlog.get_LastMessageTimestamp(id_)) > 86400):
                         print("...doubling down...")
                         double_down = True
                     else:
