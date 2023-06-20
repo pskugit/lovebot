@@ -64,6 +64,17 @@ class ChatGpt(Gpt):
         if self.allowance is not None:
             self.allowance.decrement()  
         return reply
+    
+    def clean_reply(self, reply: str, name_me: str):
+        origial_reply = reply
+        reply = reply.strip("\"")
+        reply = reply.strip(name_me)
+        reply = reply.strip(":")
+        reply = reply.strip()
+        reply = reply.replace("\"", "")
+        if origial_reply != reply:
+            print(f"GPT reply had to be cleaned. Original was: {origial_reply}")
+        return reply
 
     def _conversation_to_messages(self, conversation, name_them, name_me=DEFAULT_NAME_ME, last_n=0):
             gpt_messages = []
@@ -74,14 +85,19 @@ class ChatGpt(Gpt):
     
     def build_prompt(self, conversation, bio, name_them, name_me=DEFAULT_NAME_ME, personal_info=PERSONAL_INFO, location=LOCATION_ME, initial=True, double_down=False, last_n=0):
         gpt_messages = []
-        setting_primer = f"Setting: Dating App. {location}.\nYou act as {name_me}: A chill and educated person who always finds the right words to be attractive to others \
+        setting_primer = f"Setting: Dating App. {location}.\nYou act as {name_me}: A chill easy-going person who always finds the right words to be attractive to others \
 You are chatting with {name_them}, who matched with you on Tinder. {name_me} has a friendly but straightforward attitude.\n\
-{name_me} tends to ask witty entertaining questions relating to {name_them}'s profile and the ongoing conversation and aims to shedule a date with {name_them}.\n\
-As {name_me}, you do not need to focus on perfect grammar and sentences. In fact, you are encouraged to talk in a colloquial relateable manner. Avoid full stops. Emojis may be used when fitting.\n\
-Only provide the next chat message of any given conversation."
+{name_me} tends to ask witty entertaining questions relating to {name_them}'s profile and the ongoing conversation and aims to either shedule a date with {name_them}.\n\
+You should write in a colloquial informal manner. Emojis may be used when fitting.\n"
         gpt_messages.append({"role": "system", "content": setting_primer})
+        texting_style_primer = f"As {name_me}, messages must follow certain rules:\n\
+1. Sentences must contain grammatical errors or spelling mistakes!\n\
+2. Use full stops (.) rarely!\n\
+3. Use at most one (!!) single emoji per message! Check any message and remove emojis if there are more than one.\n\
+4. Provide the next chat message of the conversation without any formatting"
+        gpt_messages.append({"role": "system", "content": texting_style_primer})
         if personal_info:
-            personal_info_str = f"The following aspects may be useful to know about {name_me} when acting as {name_me}:\n"+personal_info
+            personal_info_str = f"The following aspects may be useful to know about {name_me} when acting as {name_me}. Use this information carefully:\n"+personal_info
             gpt_messages.append({"role": "system", "content": personal_info_str})
         assert isinstance(bio, str)
         if not bio:

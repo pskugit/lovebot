@@ -158,7 +158,7 @@ def main():
                 #WHEN USING OLD GPT ENDPOINT: reply = gpt.request(prompt, stop_sequences=[name_them+":",name_me+":",name_them+" responds", name_them+"'s response"], temperature=0.9, max_tokens=200, dryrun=gpt_dryrun)
                 reply = gpt.request(prompt, temperature=0.9, dryrun=False, return_completion_object=False)
                 # post processing
-                reply = reply.strip().strip("\"\'")
+                reply = gpt.clean_reply(reply, name_me)
                 # avoid accidental manal overtake
                 reply = reply.replace(manual_overtake_symbol,"") 
                 logger.info("::GPT::")
