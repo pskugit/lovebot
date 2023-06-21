@@ -53,6 +53,12 @@ class Backlog():
     
     def get_MsgCount(self, id_):
         return self.data.loc[id_,"msg_count"]
+    
+    def set_RepliedTo(self, id_, repliedto):
+        self.data.loc[id_,"RepliedTo"] = repliedto
+
+    def get_RepliedTo(self, id_):
+        return self.data.loc[id_,"RepliedTo"]
 
     def set_Status(self, id_, status):
         self.data.loc[id_,"Status"] = status

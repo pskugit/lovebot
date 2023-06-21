@@ -146,7 +146,12 @@ def main():
                         double_down = True
                     else:
                         continue
-
+                
+                # have i already replied to this message (sometimes tinder web application fails to show the latest message - this would result in sending the same message again)
+                if conversation.get_latest_message_text() == backlog.get_RepliedTo(id_):
+                    logger.info("------------------Status: Running. Still no reply... (message visualization bug has occured)")
+                    continue
+                
                 ### INITIATE OR CONTINUE CONVERSATION
                 logger.info("------------------Status: Running. Conversing...")
                 # build prompt
@@ -171,6 +176,7 @@ def main():
                 else:
                     ta.write_message(reply, dryrun=msg_dryrun)
                 backlog.set_LastMessageTimestamp(id_)
+                backlog.set_RepliedTo(id_, conversation.get_latest_message_text()) #note that in case of double_down, my own message will be the one saved as 'replied_to'
                 time.sleep(3)
 
             # Create run report

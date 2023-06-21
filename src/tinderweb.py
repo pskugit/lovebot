@@ -141,6 +141,9 @@ class Conversation():
     def _get_sample_message_list(self):
         return [(False,0,"message one"),(True,0,"message two"),(False,0,"message three"), (True,0,"message four")]
 
+    def get_latest_message_text(self):
+        return self.message_list[-1][2] if self.message_list else "intital"
+    
     def __len__(self):
         return len(self.message_list)
 
@@ -232,6 +235,7 @@ class TinderAutomator():
             match_meta["Rank"] = i
             match_meta["ErrorCount"] = 0
             match_meta["LastMessageTimestamp"] = None
+            match_meta["RepliedTo"] = None
             matches[id_] = match_meta
         return matches
                
