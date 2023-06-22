@@ -10,3 +10,4 @@ Pillow
 torchvision
 matplotlib
 onnxruntime
+PySide6
