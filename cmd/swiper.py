@@ -4,8 +4,9 @@ import shutil
 import logging
 import importlib
 
-from src.mymodels_onnx import TRAINED_MODELS
-from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
+from src.controller import Controller
+from src.tinder_utils.automator import TinderAutomator, SLEEP_MULTIPLIER
+from src.models.mymodels_onnx import TRAINED_MODELS
 from src.utils import load_config
 
 def main():
@@ -13,6 +14,8 @@ def main():
 
     SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
     scraping_folder_path = config['SCRAPING']["ScrapingFolder"]
+    score_threshold = float(config['SCRAPING']["Threshold"])
+    max_distance = int(config['SCRAPING']["MaxDistance"])
     os.makedirs(scraping_folder_path, exist_ok=True)
 
     # setup logger
@@ -44,6 +47,9 @@ def main():
             try:
                 # scrape images
                 controller.scrape(scraping_folder_path)
+                # set threshold and max_distance
+                ta.current_profile.set_score_threshold(score_threshold)
+                ta.current_profile.set_max_distance(max_distance)
                 # apply bikini model
                 preds, logitss = bikini_model.inference_pathlist(ta.current_profile.image_paths, apply_softmax=True)
                 ta.current_profile.has_bikini = "bikini" in preds

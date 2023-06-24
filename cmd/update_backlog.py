@@ -3,7 +3,8 @@ import os
 import time
 from dotenv import load_dotenv
 
-from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
+from src.tinder_utils.automator import TinderAutomator, SLEEP_MULTIPLIER
+from src.controller import Controller
 from src.data_interface import Backlog
 from src.utils import load_config
 

@@ -6,7 +6,7 @@ import time
 from selenium.common.exceptions import *
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from src.tinderweb import TinderAutomator
+from src.tinder_utils.automator import TinderAutomator
 from src.utils import load_config
 from dotenv import load_dotenv
 

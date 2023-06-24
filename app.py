@@ -1,10 +1,10 @@
 from PySide6 import QtCore, QtWidgets, QtGui
 from PySide6.QtUiTools import QUiLoader
 
-from src.cmd.update_backlog import main as update_backlog
-from src.cmd.swiper import main as swiper
-from src.cmd.texter import main as texter
-from src.cmd.login import main as login
+from cmd.update_backlog import main as update_backlog
+from cmd.swiper import main as swiper
+from cmd.texter import main as texter
+from cmd.login import main as login
 from src.utils import load_config
 
 path_prefix, config = load_config()

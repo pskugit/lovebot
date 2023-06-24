@@ -1,9 +1,4 @@
-# -*- coding: utf-8 -*-
-import re
 import time
-import random
-import pandas as pd
-import logging
 import pickle
 
 import chromedriver_autoinstaller
@@ -13,11 +8,12 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.common.exceptions import *
-from statemachine import StateMachine, State
+
+from src.tinder_utils.conversation import Conversation
+from src.tinder_utils.profile import Profile
 
 import urllib
 from PIL import Image
-from matplotlib import pyplot as plt
 import os
 import re
 import ssl
@@ -29,123 +25,6 @@ with socket.create_connection((hostname, 443)) as sock:
         print(ssock.version())
 
 SLEEP_MULTIPLIER = 2
-
-class Controller(StateMachine):
-    swiping = State('swiping', initial=True)
-    texting = State('texting')
-    scraping = State('scraping')
-    chat = swiping.to(texting)
-    scrape = swiping.to(scraping)
-    choice = scraping.to(swiping)
-    swipe = texting.to(swiping)
-    
-    def wait(self, sec):
-        time.sleep(sec*SLEEP_MULTIPLIER)
-
-    def on_enter_swiping(self):
-        print('Swiping!')
-
-    def on_choice(self):
-        self.model.current_profile.evaluate()
-        left_btn, right_btn, superlike_btn = self.model.find_swipe_buttons()
-        choice_dict = {"left": left_btn,
-                        "right": right_btn,
-                        "superlike": superlike_btn}
-        choice = self.model.current_profile.choice
-        choice_dict[choice].click()
-        self.wait(0.5)
-        print(f'Swiping {choice}. Closing card!')
-        self.model.remove_overlay()
-        self.model.current_profile = None
-        self.wait(0.5)
-
-    def on_scrape(self, folder_name):
-        print("on_scrape folder_name:",folder_name)
-        open_card_infos = self.model.open_card()
-        print('Opened card! Retrieved open_card_infos.')
-        print(open_card_infos)
-        downloads = self.model.scrape_images(folder_name=folder_name)
-        #print('Saved images...')
-        #print(downloads)
-    
-    def __enter__(self):
-        self.model.start_browser()
-        return self
-
-    def __exit__(self, *args): 
-        self.model.end_session()
-
-
-class Profile():
-    def __init__(self, open_card_infos):
-        # set via open_card()
-        self.infos = open_card_infos # (name, age, distance, checksum)
-        # set via scrape_images()
-        self.pic_count = None 
-        self.image_paths = None 
-        # set via model results in main script
-        self.has_bikini = None 
-        self.likescore = None 
-        # set via on_choice()
-        self.choice = None 
-    
-    def __str__(self):
-        return f"{self.infos[0]}_{self.infos[1]}_{self.infos[2]}_{self.infos[3]}\n\npic_count: {self.pic_count}\nbikini pic: {self.has_bikini}\nlikescore: {self.likescore}".replace("-","\n")
-        #return f"name: {self.infos[0]}\nage: {self.infos[1]}\ndistance: {self.infos[2]}\n\npic_count: {self.pic_count}\nimage_paths: -{'-'.join(self.image_paths)}\n\nbikini pic: {self.has_bikini}\nlikescore: {self.likescore}\n\nchoice: {self.choice}".replace("-","\n")
-
-    def show_images(self):
-        fig = plt.figure(figsize=(16, 7))
-        for i, path in enumerate(self.image_paths):
-            img = Image.open(path)
-            # Adds a subplot at the 1st position
-            fig.add_subplot(1, self.pic_count, i+1)
-            plt.imshow(img)
-            plt.axis('off')
-        plt.show()
-    
-    def evaluate(self, score_threshold=0.5):
-        self.choice = "left"
-        # distance > 1000 km
-        if self.infos[2] > 1000:
-            self.choice = "left"
-            print(f"Evaluated choice to {self.choice} because of distance")
-        elif self.has_bikini:
-            self.choice = "right"
-            print(f"Evaluated choice to {self.choice} because of bikini")
-        else:
-            if self.likescore is None:
-                self.choice = "right" if random.random() >= score_threshold else "left"
-                print(f"Evaluated choice to {self.choice} because of random choice")
-                return
-            self.choice = "right" if self.likescore >= score_threshold else "left"
-            print(f"Evaluated choice to {self.choice} because of likescore")
-        #self.choice = random.choice(["left", "right"])
-
-class Conversation():
-    """Conversation based on a list of following format: [(1,0,"message one"),(0,0,"message two"),(1,0,"message three")]
-    where the tuple contaions (theirs-flag, hearted-flag, text)
-    """
-    def __init__(self, message_list):   
-        self.message_list = message_list
-        self.myturn = True if not message_list else (message_list[-1][0] or message_list[-1][1])
-        self.is_doubled_down =  False if (len(message_list) < 3) else message_list[-1][0] * message_list[-2][0]
-
-    def find_in_conversation(self, searchstring, only_mine=False):
-        """returns the text of the first message of the conversation that contains the searchstring"""
-        for theirs, hearted, message_text in self.message_list:
-            if not (only_mine and theirs):
-                if searchstring in message_text:
-                    return message_text
-        return ""
-    
-    def _get_sample_message_list(self):
-        return [(False,0,"message one"),(True,0,"message two"),(False,0,"message three"), (True,0,"message four")]
-
-    def get_latest_message_text(self):
-        return self.message_list[-1][2] if self.message_list else "intital"
-    
-    def __len__(self):
-        return len(self.message_list)
 
 class TinderAutomator():  
     def __init__(self, initial_state="swiping", startpage="https://tinder.com/app/recs", chromedata_path="chromedata", headless=False):
@@ -333,6 +212,7 @@ class TinderAutomator():
         #text = self.browser.find_element(By.XPATH, '//*').text
         #match_layer = "IT’S A" in text.split("\n")
         #if match_layer:
+        self.wait(1)
         self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.ESCAPE)
         self.wait(3)
 

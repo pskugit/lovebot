@@ -5,7 +5,8 @@ import random
 import pandas as pd
 import logging
 
-from src.tinderweb import TinderAutomator, Controller, SLEEP_MULTIPLIER
+from src.controller import Controller
+from src.tinder_utils.automator import TinderAutomator, SLEEP_MULTIPLIER
 from src.data_interface import Backlog, STATUS_CODE, STATUS_CODE_INV
 from src.gpt import Gpt3, Allowance, ChatGpt
 from src.utils import load_config
