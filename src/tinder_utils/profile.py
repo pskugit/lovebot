@@ -44,7 +44,7 @@ class Profile():
         # distance > 1000 km
         if self.infos[2] > self.max_distance:
             self.choice = "left"
-            print(f"Evaluated choice to {self.choice} because of distance")
+            print(f"Evaluated choice to {self.choice} because of distance. Max distance is {self.max_distance}")
         elif self.has_bikini:
             self.choice = "right"
             print(f"Evaluated choice to {self.choice} because of bikini")

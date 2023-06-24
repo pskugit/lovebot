@@ -5,14 +5,12 @@ import logging
 import importlib
 
 from src.controller import Controller
-from src.tinder_utils.automator import TinderAutomator, SLEEP_MULTIPLIER
+from src.tinder_utils.automator import TinderAutomator
 from src.models.mymodels_onnx import TRAINED_MODELS
 from src.utils import load_config
 
 def main():
     path_prefix, config = load_config()
-
-    SLEEP_MULTIPLIER = int(config["DEFAULT"]["SleepTime"])
     scraping_folder_path = config['SCRAPING']["ScrapingFolder"]
     score_threshold = float(config['SCRAPING']["Threshold"])
     max_distance = int(config['SCRAPING']["MaxDistance"])

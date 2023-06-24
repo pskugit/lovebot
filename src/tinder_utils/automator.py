@@ -1,5 +1,6 @@
 import time
 import pickle
+import pandas as pd
 
 import chromedriver_autoinstaller
 chromedriver_autoinstaller.install()
@@ -214,6 +215,7 @@ class TinderAutomator():
         #if match_layer:
         self.wait(1)
         self.browser.find_element(By.TAG_NAME, 'body').send_keys(Keys.ESCAPE)
+        self.browser.find_element(By.TAG_NAME, 'body').click()
         self.wait(3)
 
     def open_card(self):

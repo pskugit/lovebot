@@ -26,7 +26,11 @@ class Controller(StateMachine):
                         "superlike": superlike_btn}
         choice = self.model.current_profile.choice
         choice_dict[choice].click()
-        self.wait(0.5)
+        self.wait(1)
+        super_like_dialog = self.model.find_by_xpath('//*[@id="q1595321969"]/main/div/button[1]/div[2]/div[2]')
+        if super_like_dialog is not None:
+            self.model.remove_overlay()
+            choice_dict[choice].click()
         print(f'Swiping {choice}. Closing card!')
         self.model.remove_overlay()
         self.model.current_profile = None
