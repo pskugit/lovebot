@@ -27,7 +27,7 @@ class Controller(StateMachine):
         choice = self.model.current_profile.choice
         choice_dict[choice].click()
         self.wait(1)
-        super_like_dialog = self.model.find_by_xpath('//*[@id="q1595321969"]/main/div/button[1]/div[2]/div[2]')
+        super_like_dialog = self.model.find_by_xpath('//*[@id="q1595321969"]/main/div/button[1]/div[2]/div[2]', silent=True)
         if super_like_dialog is not None:
             self.model.remove_overlay()
             choice_dict[choice].click()

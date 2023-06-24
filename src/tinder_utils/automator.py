@@ -57,11 +57,12 @@ class TinderAutomator():
     def wait(self, sec):
         time.sleep(sec*SLEEP_MULTIPLIER)
 
-    def find_by_xpath(self, xpath):
+    def find_by_xpath(self, xpath, silent=False):
         try:
             element = self.browser.find_element(By.XPATH, xpath)
         except NoSuchElementException:
-            print("Element not found:", xpath)
+            if not silent:
+                print("Element not found:", xpath)
             return None
         return element
 
