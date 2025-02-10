@@ -38,7 +38,6 @@ RetryCount=3
 ScrapingFolder=#choose path to download scraped imaged
 
 [MODELS]
-Bikini=#enter path to model .onnx file
 Like=#enter path to model .onnx file
 OpenAI=#enter openai API key
 ```
